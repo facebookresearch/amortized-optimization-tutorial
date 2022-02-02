@@ -193,6 +193,8 @@ and other applications beyond the scope here.
     many reinforcement learning policies $\pi_\theta(x)\defeq\hat y_\theta(x)$
     amortize the solution to the underlying control problem
     with true solution $y^\star(x)$.
+    This optimal humanoid policy was obtained with the model-based
+    stochastic value gradient in \citet{amos2021model}.
   }
   \label{fig:overview}
 \end{figure}
@@ -298,7 +300,7 @@ in \cref{sec:model:full} that approximate the entire solution
 to the optimization problem with a single black-box model.
 Then \cref{sec:model:semi} shows how to open up the model
 to include more information about the optimization problem
-that can leverage domain knowledge.
+that can leverage domain knowledge with \emph{semi-amortized} models.
 
 \subsection{Fully-amortized models}
 \label{sec:model:full}
@@ -414,7 +416,7 @@ models by unrolling in \cref{sec:unrolled} and will
 then later see many other instantiations of it:
 \begin{itemize}
 \item \Cref{sec:apps:lista} discusses how
-\citet{gregor2010learning} integrates ISTA iterates
+\citet{gregor2010learning} integrate ISTA iterates
 \citep{daubechies2004iterative,beck2009fast}
 into a semi-amortized model.
 \item \Cref{sec:apps:neural-fp} discusses models that integrate
@@ -803,7 +805,7 @@ disadvantages ($-$):
 \con Does not consider $f(y; x)$
 \pro Uses global information with $y^\star(x)$
 \con Expensive to compute $y^\star(x)$
-\pro Does not use $\nabla_y f(y; x)$
+\pro Does not compute $\nabla_y f(y; x)$
 \con Hard to learn non-unique $y^\star(x)$
 \end{itemize}
 \end{minipage}
@@ -813,7 +815,7 @@ disadvantages ($-$):
 \pro Uses objective information of $f(y; x)$
 \con Can get stuck in local optima of $f(y; x)$
 \pro Faster, does not require $y^\star(x)$
-\con Often requires $\nabla_y f(y; x)$
+\con Often requires computing $\nabla_y f(y; x)$
 \pro Easily learns non-unique $y^\star(x)$
 \end{itemize}
 \end{minipage}
@@ -1195,6 +1197,7 @@ the optimization problem over continuous densities $g$:
   g^\star(\mu, \Sigma)\in \argmin_g H[g]\; \subjectto\; \E_g[x] = \mu\; {\rm and}\; \E_g[xx^\top] = \Sigma.
   \label{eq:maxent}
 \end{equation}
+% TODO: better-define?
 The solution of $g^\star$ being a Gaussian density can be
 obtained by taking the Lagrangian with respect to the density $g$.
 Variations and generalizations of this setting leads to
@@ -1255,11 +1258,12 @@ These projections can be generally defined by the following:
 be \emph{idempotent}, \ie applying the projection twice gives the same result
 so that $\pi\circ \pi=\pi$.
 Unfortunately, projections as defined in \cref{def:proj},
-such as Bregman projections, are \emph{not} idempotent and
-often $\pi_\gC\circ \pi_\gC\neq \pi_\gC$
+such as Bregman projections, are \emph{not} idempotent in general
+and often $\pi_\gC\circ \pi_\gC\neq \pi_\gC$
 as the regularizer $\Omega$ may cause points that are already on $\gC$
 to move to a different position on $\gC$.
 
+% TODO: Projection fig?
 \textbf{Projections for constrained amortization.}
 These can be used to cast \Cref{eq:opt-constrained} as the unconstrained
 problem \cref{eq:opt} by composing the objective with a projection
@@ -1325,6 +1329,7 @@ implicit differentiation.
 \citet{amos2019limited} creates a differentiable top-$k$
 projection layer that implicitly differentiates through projections
 onto the capped simplex.
+% TODO: Expand on these projections?
 \citet{ali2017semismooth,busseti2019solution} differentiate
 through projections onto other convex cones, including
 the second-order cone, positive semidefinite cone,
@@ -3307,7 +3312,7 @@ fully-amortized models with gradient-based learning
 and includes applications in variational inference,
 meta-learning, image style transfer,
 and survival-based classification.
-\item \citet{weng2018metalearning} is a long blog post
+\item \citet{weng2018metalearning} is a blog post
   with an introduction and review of meta-learning methods.
   After defining the problem setup, the review discusses
   metric-based, model-based, and optimization-based approaches,
@@ -3327,7 +3332,7 @@ differential equations, quadratic optimization, inverse problems,
 constrained optimization, image restoration and reconstruction,
 medical and biological imaging, wireless communications,
 seismic imaging.
-\item \citet{hospedales2020meta} is a reviewed focused on meta-learning,
+\item \citet{hospedales2020meta} is a review focused on meta-learning,
   where they categorize meta-learning components into a
   meta-representation, meta-optimizer, and meta-objective.
   The most relevant connections to amortization here are that
@@ -3403,6 +3408,7 @@ from the shared amortization models here.
 
 \acks{%
   I would like to thank
+  Nil-Jana Akpinar,
   Samuel Cohen,
   Hane Lee,
   Maximilian Nickel,
