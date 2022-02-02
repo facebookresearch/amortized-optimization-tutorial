@@ -1,0 +1,15 @@
+*.pdf
+!**/fig/**/*.pdf
+*.out
+*.toc
+*.log
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.xml
+*.bcf
+*.gz
+.deps
+.deps-a

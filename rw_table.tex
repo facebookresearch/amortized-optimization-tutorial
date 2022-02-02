@@ -1,0 +1,41 @@
+% Copyright (c) Meta Platforms, Inc. and affiliates.
+\hspace*{-8mm}
+\resizebox{1.1\textwidth}{!}{
+\begin{tabular}{rcccccc}
+& Application & Objective $f$ & Domain $\gY$ & Context Space $\gX$ & Amortization model $\hat y_\theta$ & Loss $\gL$ \\ \toprule
+\cref{sec:apps:avi} & VAE & $-\ELBO$ & Variational posterior & Data & Full & $\gL_{\rm obj}$ \\
+& SAVAE/IVAE & | & | & | & Semi & | \\
+\midrule
+\cref{sec:apps:lista} & PSD & Reconstruction & Sparse code & Data & Full & $\gL_{\rm reg}$ \\
+& LISTA & | & | & | & Semi & | \\
+\midrule
+\cref{sec:apps:meta} & HyperNets & Task loss & Model parameters & Tasks & Full & $\gL_{\rm obj}$ \\
+& LM & | & | & | & Semi & $\gL^{\rm RL}_{\rm obj}$ \\
+& MAML & | & | & | & | & $\gL_{\rm obj}$ \\
+& Neural Potts & Pseudo-likelihood & | & Protein sequences & Full & $\gL_{\rm obj}$ \\
+\midrule
+\cref{sec:apps:convex} & NeuralFP & FP residual & FP iterates & FP contexts & Semi & $\gL_{\rm obj}^\Sigma$ \\
+& HyperAA & | & | & | & | & $\gL_{\rm reg}^\Sigma$ \\
+& NeuralSCS & CP residual & CP iterates & CP parameters & | & $\gL_{\rm obj}^\Sigma$ \\
+& HyperDEQ & DEQ residual & DEQ iterates & DEQ parameters & | & $\gL_{\rm reg}^\Sigma$ \\
+& RLQP & $R_{\rm RLQP}$ & QP iterates & QP parameters & | & $\gL^{\rm RL}_{\rm obj}$ \\
+\midrule
+\cref{sec:apps:ctrl} & BC/IL & $-Q$-value & Controls & State space & Full & $\gL_{\rm reg}$ \\
+& DPG/DDPG/TD3 & | & | & | & | & $\gL_{\rm obj}$ \\
+& PILCO & | & | & | & | & $\gL_{\rm obj}$ \\
+& POPLIN & | & | & | & Full or semi & $\gL_{\rm reg}$ \\
+& DCEM & | & | & | & Semi & $\gL_{\rm reg}$ \\
+& IAPO & | & | & | & | & $\gL_{\rm obj}$ \\
+& SVG & $\D_\gQ$ or $-\gE_Q$ & Control dists & | & Full & $\gL_{\rm obj}$ \\
+& SAC & | & | & | & | & $\gL_{\rm obj}$ \\
+& GPS & | & | & | & | & $\gL_{\rm KL}$ \\
+\midrule
+\cref{sec:apps:sphere} & Synthetic Sphere & $c$-convex functions & $\gS^2\rightarrow \R^3$ & RCPM parameters & Full & $\gL_{\rm obj}$ \\
+\bottomrule
+\end{tabular}}
+
+%%% Local Variables:
+%%% coding: utf-8
+%%% mode: latex
+%%% TeX-master: "amor"
+%%% End:
