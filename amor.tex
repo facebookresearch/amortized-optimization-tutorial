@@ -210,16 +210,8 @@ the solution mapping $y^\star$.
 Amortized optimization is promising because in many applications,
 there are significant correlations and structure between the
 solutions that show up in $y^\star$ that a model can learn.
-The term \emph{amortization} originates in the
-variational inference community \citep{kingma2013auto,rezende2014stochastic,stuhlmuller2013learning,gershman2014amortized,webb2017faithful,ravi2018amortized,cremer2018inference,wu2020meta},
-and has been expanded to more general optimization settings
-\citep{xue2020amortized,sercu2021neural,xiao2021amortized}.
-While there are other general formulations of
-learning to optimize, such as
-\citet{li2016learning,chen2021learning,heaton2021learning},
-we will connect to these later and instead follow
-\citet{shu2017amortized} for defining the core foundation
-of amortized optimization as:
+We follow \citet{shu2017amortized} for defining the core
+foundation of amortized optimization as:
 
 \begin{definition}
   An \emph{amortized optimization method} to solve \cref{eq:opt}
@@ -258,9 +250,18 @@ can significantly improve the performance.
 The generalization capacity along with the model's
 convergence guarantees are challenging topics
 that \cref{sec:generalization} covers in more detail.
-% We now turn to foundations for crafting
-% the model and loss, and then move on to concretely
-% instantiate them in \cref{sec:apps}.
+
+\textbf{Origins of the term ``amortization'' for optimization.}
+The word ``amortization'' generally means to spread out costs and
+thus ``amortized optimization'' usually means to spread out
+computational costs of the optimization process.
+The term originated in the variational inference community
+for inference optimization
+\citep{kingma2013auto,rezende2014stochastic,stuhlmuller2013learning,gershman2014amortized,webb2017faithful,ravi2018amortized,cremer2018inference,wu2020meta},
+and is used more generally in
+\citep{xue2020amortized,sercu2021neural,xiao2021amortized}.
+\citet[p.~28]{marino2021learned} give further background on the
+origins and uses of amortization.
 
 \textbf{Conventions and notation.}
 The context space $\gX$ represents the
@@ -551,7 +552,7 @@ model derivatives.
 \textbf{Starting with a single-step model.}
 We first instantiate a single-step model
 similar to \cref{eq:gd} that parameterizes the initial
-iterate $\hat y^0_\theta(x)=\theta$ and takes one gradient step:
+iterate $\hat y^0_\theta(x)\defeq\theta$ and takes one gradient step:
 \begin{equation}
   \hat y_\theta(x)\defeq \hat y^0_\theta(x) - \alpha \nabla_y f(\hat y^0_\theta(x); x)
   \label{eq:single-step}
@@ -573,7 +574,7 @@ We extend \cref{eq:single-step} to the $K$-step setting with
 \begin{equation}
 \hat y_\theta^K(x)\defeq \hat y^{K-1}_\theta(x) - \alpha\nabla_y f(\hat y^{K-1}_\theta(x); x),
 \end{equation}
-where the base $\hat y_\theta^0(x)=\theta$ as before.
+where the base $\hat y_\theta^0(x)\defeq\theta$ as before.
 Similar to \cref{eq:second-derivatives-single-step},
 the derivative of a single step is
 \begin{equation}
@@ -772,6 +773,28 @@ is informative and the objective and models are easily differentiable.
 We will see that amortized variational inference methods and
 actor-critic methods both make extensive use of
 objective-based learning.
+
+\begin{remark}
+  A standard gradient-based optimizer for \cref{eq:opt} (without amortization)
+  can be recovered from $\gL_{\rm obj}$ by setting the model to the identity
+  of the parameters, \ie $\hat y_\theta(x)\defeq\theta$, and $p(x)$ to be a Dirac
+  centered at a point $\bar x$
+\end{remark}
+
+This can be seen by taking $\D_\theta[\hat y_\theta(x)]=I$
+in \cref{eq:grad-loss-grad}, resulting in
+$\nabla_\theta \gL_{\rm obj}(\hat y_\theta)=\nabla_y f(\hat y_\theta(x); x)$.
+Thus optimizing $\theta$ of this parameter-identity model with gradient descent
+is identical to solving \cref{eq:opt} with gradient descent.
+This shows a connection between a model trained with gradients of
+an objective-based loss and a non-amortized gradient-based solver for
+\cref{eq:opt}.
+The gradient update that would originally have been applied to an
+iterate $y\in\gY$ of the domain is now transferred into the
+model's parameters that are shared across all problem instances.
+This also leads us to the intuition that objective-based amortization
+works best when a gradient-based optimizer is able to successfully
+solve \cref{eq:opt} from scratch.
 
 \subsubsection{Comparing the regression- and objective-based losses}
 \begin{wrapfigure}{r}{1.8in}
@@ -1088,7 +1111,6 @@ and \citet{ichnowski2021accelerating} uses TD3 \citep{fujimoto2018td3}.
 We use $\gL^{\rm RL}$ to indicate that a loss is optimized with reinforcement learning,
 typically on the objective-based loss.
 
-\newpage
 \subsubsection{Loss smoothing and optimization with zeroth-order methods}
 \label{sec:smooth}
 
@@ -1372,14 +1394,16 @@ Symbolic models are one potential answer to this that attempt
 to search over a symbolic space that is much closer to the
 operations that humans would use to implement update rules for
 an optimization solver.
+Early studies of these methods include
+\citet{bengio1994use,runarsson2000evolution}.
 \citet{bello2017neural} significantly advances this direction
 by posing the learned optimizer as a reinforcement learning problem
 where the actions produce the operations underlying the update rules.
 They show how existing methods can be symbolically implemented
 using this formulation, and learn better update rules for
 classification and machine translation tasks.
-They propose two new human-interpretable optimization methods
-their models uncovered.
+Symbolic methods are further studied and scaled in
+\citet{real2020automl,zheng2022symbolic}.
 
 This direction of work challenges the best accelerated and adaptive
 gradient-based optimizers that are used for machine learning.
@@ -1566,13 +1590,19 @@ We focus on the relevant components of amortized
 variational inference (AVI) used in machine learning
 for the variational autoencoder (VAE) and
 related generative models
-\citep{kingma2013auto,rezende2014stochastic,mnih2014neural,rezende2015variational,higgins2016beta,doersch2016tutorial}
+\citep{kingma2013auto,rezende2014stochastic,mnih2014neural,rezende2015variational,higgins2016beta,doersch2016tutorial,kingma2019introduction}
 and refer to references such as
 \citet{jordan1999introduction,wainwright2008graphical,blei2017variational}
 for a complete background in variational inference.
-These models model the density $p(x)$ over
-a high-dimensional space, for example images, text, or
-videos, given samples $x\sim p(x)$.
+\citet{kim2020deep,marino2021learned} provide additional background
+on the use of amortization and semi-amortization in these settings.
+Historically, the use of an encoder network for amortized inference
+is often traced back to the Helmholtz machine \citep{dayan1995helmholtz},
+which uses a fully-amortized model but without a proper gradient estimator.
+
+\subsection{The variational autoencoder (VAE) by \citet{kingma2013auto}}
+A VAE models a density $p(x)$ over a high-dimensional space,
+for example images, text, or videos, given samples $x\sim p(x)$.
 They introduce a lower-dimensional latent space
 with a known distribution $p(z)$, such as an isotropic Gaussian,
 designed to capture hidden structure present
@@ -1985,9 +2015,17 @@ Here we selectively summarize a few other relevant ideas:
   Their models learn to ``hop'' out of these minima
   and are able to generalize more efficiently to
   new elements or atomic compositions.
+\item \citet{huang2022optimizer} show how to use
+  information from existing classes of ``teacher''
+  optimizers to learn a new ``student'' one that
+  can result in even better performance,
+  which they refer to as \emph{optimizer amalgamation}.
+  This is done by optimizing for the objective-based
+  loss with additional regression-based terms that
+  encourage the learned optimizer to match one or
+  more trajectories of the existing optimizers.
 \end{enumerate}
 
-\newpage
 \subsection{Amortized fixed point computations and convex optimization}
 \label{sec:apps:convex}
 
@@ -2064,6 +2102,7 @@ into root-finding problems.
 
 \subsubsection{Neural fixed-point acceleration (NeuralFP) and conic optimization with the splitting cone solver (NeuralSCS)}
 \label{sec:apps:neural-fp}
+% TODO: \citep{sjölund2022graphbased} \citep{bastianello2021opreg}
 \emph{Neural fixed-point acceleration} \citep{venkataraman2021neural}
 proposes a semi-amortized method for computing fixed-points
 and use it for convex cone programming.
@@ -2505,7 +2544,6 @@ location of the mass.
   which is the max-$Q$ operation in \cref{eq:Q-opt}.
 \end{proof}
 
-\newpage
 \noindent Similarly for the for the KL problem in \cref{eq:Q-opt-sto-kl}:
 \begin{proposition}
   Let $\pi$ be a Dirac delta distribution $\delta_u(\cdot)$.
@@ -2625,7 +2663,7 @@ This amortization viewpoint can be extended to \emph{stochastic} systems
 and policies that use the \emph{stochastic value gradient} (SVG)
 and covers a range of model-free to model-based method depending on
 how the value is estimated
-\citep{byravan2019imagined,hafner2019dream,byravan2020imagined,byravan2021evaluating,amos2021model}.
+\citep{byravan2019imagined,hafner2019dream,byravan2021evaluating,amos2021model}.
 As observed in
 \citet{haarnoja2018soft,amos2021model},
 the policy update step in the soft actor-critic
@@ -2873,6 +2911,7 @@ the policy $\pi_\theta$ solving the latent
 optimization problem with DCEM.
 
 \subsubsection{Iterative amortized policy optimization (IAPO) by \citet{marino2020iterative}}
+% TODO: More details, and connections to control as inference?
 IAPO takes a probabilistic view and
 starts with the observation that DPG and SVG methods
 are amortized optimization problems with fully-amortized
@@ -3307,31 +3346,39 @@ meta-learning over continuous domains
 that I am aware of are excellent resources:
 
 \begin{itemize}
+\item \citet{chen2021learning} captures many other emerging areas
+  of learning to optimize and discuss many other modeling paradigms
+  and optimization methods for learning to optimize, such as
+  plug-and-play methods \citep{venkatakrishnan2013plug,meinhardt2017learning,rick2017one,zhang2017learning}.
+  They emphasize the key aspects and questions to tackle as a community,
+  including model capacity, trainability, generalization, and
+  interpretability.
+  They propose \emph{Open-L2O} as a new benchmark for
+  learning to optimize and review many other applications,
+  including sparse and low-rank regression, graphical models,
+  differential equations, quadratic optimization, inverse problems,
+  constrained optimization, image restoration and reconstruction,
+  medical and biological imaging, wireless communications,
+  seismic imaging.
 \item \citet{shu2017amortized} is a blog post that discusses
-fully-amortized models with gradient-based learning
-and includes applications in variational inference,
-meta-learning, image style transfer,
-and survival-based classification.
+  fully-amortized models with gradient-based learning
+  and includes applications in variational inference,
+  meta-learning, image style transfer,
+  and survival-based classification.
 \item \citet{weng2018metalearning} is a blog post
   with an introduction and review of meta-learning methods.
   After defining the problem setup, the review discusses
   metric-based, model-based, and optimization-based approaches,
   and discusses approximations to the second-order derivatives
   that come up with MAML.
-\item \citet{chen2021learning} captures many other emerging areas
-of learning to optimize and discuss many other modeling paradigms
-and optimization methods for learning to optimize, such as
-plug-and-play methods \citep{venkatakrishnan2013plug,meinhardt2017learning,rick2017one,zhang2017learning}.
-They emphasize the key aspects and questions to tackle as a community,
-including model capacity, trainability, generalization, and
-interpretability.
-They propose \emph{Open-L2O} as a new benchmark for
-learning to optimize and review many other applications,
-including sparse and low-rank regression, graphical models,
-differential equations, quadratic optimization, inverse problems,
-constrained optimization, image restoration and reconstruction,
-medical and biological imaging, wireless communications,
-seismic imaging.
+\item The dissertation \citet{kim2020deep} is on deep
+  latent variable models for natural language
+  and contextualizes and studies the use of amortization and
+  semi-amortization in this setting.
+\item The dissertation \citet{marino2021learned} is on learned
+  feedback and feedforward information for perception and control
+  and contextualizes and studies the use of amortization and
+  semi-amortization in these settings.
 \item \citet{hospedales2020meta} is a review focused on meta-learning,
   where they categorize meta-learning components into a
   meta-representation, meta-optimizer, and meta-objective.
@@ -3379,7 +3426,7 @@ optimizer for every encountered state.
 learn latent action spaces for high-dimensional
 discrete action spaces with shared structure.
 
-\subsection{Learning-augmented algorithms beyond optimization}
+\subsection{Learning-augmented and amortized algorithms beyond optimization}
 While many algorithms can be interpreted as solving an
 optimization problems or fixed-point computations and
 can therefore be improved with amortized optimization,
@@ -3393,6 +3440,8 @@ learning solutions to differential equations
 learning simulators for physics \citep{grzeszczuk1998neuroanimator,ladicky2015data,he2019learning,sanchez2020learning,wiewel2019latent,usman2021machine,vinuesa2021potential},
 and learning for symbolic math
 \citep{lample2019deep,charton2021linear,charton2021deep,drori2021neural,dascoli2022deep}
+\citet{salimans2022progressive} progressively amortizes a
+sampling process for diffusion models.
 
 \subsection{Continuation and homotopy methods}
 Amortized optimization settings share a similar motivation to
@@ -3406,15 +3455,21 @@ This similarity indicates that problem classes typically
 studied by continuation and homotopy methods could also benefit
 from the shared amortization models here.
 
+% TODO: Other refs?
+%   Data-driven optimization? \citep{banert2020data}
+%   Uncertainty-aware learning to optimize \citep{you2022bayesian}
+
 \acks{%
   I would like to thank
   Nil-Jana Akpinar,
   Samuel Cohen,
   Hane Lee,
+  Joe Marino,
   Maximilian Nickel,
   Alex Terenin,
+  Eugene Vinitsky,
   and
-  Eugene Vinitsky
+  Atlas Wang
   for insightful discussions and feedback
   on this tutorial.
   Any additional thoughts, insights, corrections,
@@ -3422,7 +3477,6 @@ from the shared amortization models here.
   \url{bda@fb.com}
 }
 
-\newpage
 {\footnotesize\bibliography{amor}}
 
 \end{document}
