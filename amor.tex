@@ -777,8 +777,9 @@ objective-based learning.
 \begin{remark}
   A standard gradient-based optimizer for \cref{eq:opt} (without amortization)
   can be recovered from $\gL_{\rm obj}$ by setting the model to the identity
-  of the parameters, \ie $\hat y_\theta(x)\defeq\theta$, and $p(x)$ to be a Dirac
-  centered at a point $\bar x$
+  of the parameters, \ie $\hat y_\theta(x)\defeq\theta$, and $p(x)$ to be a
+  Dirac delta distribution.
+  \label{remark:obj-loss}
 \end{remark}
 
 This can be seen by taking $\D_\theta[\hat y_\theta(x)]=I$
@@ -786,9 +787,9 @@ in \cref{eq:grad-loss-grad}, resulting in
 $\nabla_\theta \gL_{\rm obj}(\hat y_\theta)=\nabla_y f(\hat y_\theta(x); x)$.
 Thus optimizing $\theta$ of this parameter-identity model with gradient descent
 is identical to solving \cref{eq:opt} with gradient descent.
-This shows a connection between a model trained with gradients of
-an objective-based loss and a non-amortized gradient-based solver for
-\cref{eq:opt}.
+\Cref{remark:obj-loss} shows a connection between a model trained with
+gradients of an objective-based loss and a non-amortized gradient-based
+solver for \cref{eq:opt}.
 The gradient update that would originally have been applied to an
 iterate $y\in\gY$ of the domain is now transferred into the
 model's parameters that are shared across all problem instances.
