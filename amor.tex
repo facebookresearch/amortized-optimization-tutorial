@@ -2564,17 +2564,20 @@ location of the mass.
   \begin{equation}
     \begin{aligned}
       \kl{\delta_u(\cdot)}{\gQ(x, \cdot)}
-      & = \E_{\tilde u\sim \delta_u(\cdot)} \frac{\log{\delta_u(\tilde u)}}{\log \gQ(x,u)} \\
-      & = -\log \gQ(x,u) \\
-      & = -\log \frac{1}{\gZ_x}\exp\left\{Q(x,u)\right\} \\
-      & = -Q(x, u) + \log \gZ_x \\
+      & = \E_{\tilde u\sim \delta_u(\cdot)} \left[ \log{\delta_u(\tilde u)} - \log \gQ(x,\tilde u)\right] \\
+      & = -\log \gQ(x,u)+C \\
+      & = -\log \frac{1}{\gZ_x}\exp\left\{Q(x,u)\right\} + C\\
+      & = -Q(x, u) + \log \gZ_x + C \\
     \end{aligned}
     \label{eq:kl-expansion}
   \end{equation}
-  where $\gQ(x,u)$ is the density at $u$, $\gZ_x$ is the
-  normalization constant for $\gQ(x,\cdot)$ that does not depend
-  on $u$. Putting \cref{eq:kl-expansion} back into
-  \cref{kl-dirac-opt} and removing the irrelevant $\gZ_x$ gives
+  where $C$ is a constant that does not depend on $u$,
+  $\gQ(x,u)$ is the density at $u$, and
+  $\gZ_x$ is the normalization constant for $\gQ(x,\cdot)$
+  that does not depend on $u$.
+  Putting \cref{eq:kl-expansion} back into
+  \cref{kl-dirac-opt} and removing the constants that
+  do not depend on $u$ gives
   \begin{equation}
   \pi^\star(x)\in \argmin_{u\in\R^n} -Q(x,u),
   \end{equation}
