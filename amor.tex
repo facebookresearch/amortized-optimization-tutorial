@@ -20,7 +20,18 @@
 
 \usepackage{xcolor}
 \definecolor{linkcolor}{RGB}{168, 141, 201}
-\usepackage[colorlinks=true,allcolors=linkcolor,pageanchor=true,plainpages=false,pdfpagelabels,bookmarks,bookmarksnumbered]{hyperref}
+\usepackage[
+colorlinks=true,allcolors=linkcolor,pageanchor=true,
+plainpages=false,pdfpagelabels,bookmarks,bookmarksnumbered,
+backref=page
+]{hyperref}
+
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd{\BR@backref}{\newblock}{\newblock(page~}{}{}
+\patchcmd{\BR@backref}{\par}{)\par}{}{}
+\makeatother
+
 
 \usepackage[nameinlink]{cleveref}
 \Crefname{equation}{Eq.}{Eqs.}
@@ -2009,13 +2020,19 @@ Here we selectively summarize a few other relevant ideas:
   dynamically weighting reparameterization
   gradients and zeroth-order evolutionary methods to
   optimize the smoothed loss in \cref{eq:smooth-loss}.
-\item \citet{merchant2021learn2hop} further builds on
+\item \citet{merchant2021learn2hop} further build on
   the advancements of \citet{metz2019understanding} for
   semi-amortized atomic structural optimization, which
   is a setting rife with poor local minimum.
   Their models learn to ``hop'' out of these minima
   and are able to generalize more efficiently to
   new elements or atomic compositions.
+\item \citet{zhang2018graph,knyazev2021parameter} explore
+  the fully-amortized HyperNets for architecture search
+  for predicting parameters on CIFAR-10 and ImageNet.
+  These models take a model's compute graph as the
+  context and use a graph neural network to predict
+  the optimal parameters of that architecture on a task.
 \item \citet{huang2022optimizer} show how to use
   information from existing classes of ``teacher''
   optimizers to learn a new ``student'' one that
@@ -3462,12 +3479,14 @@ from the shared amortization models here.
 % TODO: Other refs?
 %   Data-driven optimization? \citep{banert2020data}
 %   Uncertainty-aware learning to optimize \citep{you2022bayesian}
+%   \citet{liu2022teaching}
 
 \acks{%
   I would like to thank
   Nil-Jana Akpinar,
   Samuel Cohen,
   Georgina Hall,
+  Boris Knyazev,
   Hane Lee,
   Joe Marino,
   Maximilian Nickel,
