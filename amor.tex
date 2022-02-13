@@ -26,11 +26,12 @@ plainpages=false,pdfpagelabels,bookmarks,bookmarksnumbered,
 backref=page
 ]{hyperref}
 
-\usepackage{etoolbox}
-\makeatletter
-\patchcmd{\BR@backref}{\newblock}{\newblock(page~}{}{}
-\patchcmd{\BR@backref}{\par}{)\par}{}{}
-\makeatother
+\renewcommand*{\backref}[1]{}
+\renewcommand*{\backrefalt}[4]{%
+  \ifcase #1 \or (Page~#2.)
+  \else (Pages~#2.)
+  \fi%
+}
 
 
 \usepackage[nameinlink]{cleveref}
@@ -204,7 +205,7 @@ and other applications beyond the scope here.
     many reinforcement learning policies $\pi_\theta(x)\defeq\hat y_\theta(x)$
     amortize the solution to the underlying control problem
     with true solution $y^\star(x)$.
-    This optimal humanoid policy was obtained with the model-based
+    This humanoid policy was obtained with the model-based
     stochastic value gradient in \citet{amos2021model}.
   }
   \label{fig:overview}
@@ -1612,7 +1613,7 @@ Historically, the use of an encoder network for amortized inference
 is often traced back to the Helmholtz machine \citep{dayan1995helmholtz},
 which uses a fully-amortized model but without a proper gradient estimator.
 
-\subsection{The variational autoencoder (VAE) by \citet{kingma2013auto}}
+\subsubsection{The variational autoencoder (VAE) by \citet{kingma2013auto}}
 A VAE models a density $p(x)$ over a high-dimensional space,
 for example images, text, or videos, given samples $x\sim p(x)$.
 They introduce a lower-dimensional latent space
@@ -3392,11 +3393,11 @@ that I am aware of are excellent resources:
   metric-based, model-based, and optimization-based approaches,
   and discusses approximations to the second-order derivatives
   that come up with MAML.
-\item The dissertation \citet{kim2020deep} is on deep
+\item \citet{kim2020deep} is a dissertation on deep
   latent variable models for natural language
   and contextualizes and studies the use of amortization and
   semi-amortization in this setting.
-\item The dissertation \citet{marino2021learned} is on learned
+\item \citet{marino2021learned} is a dissertation on learned
   feedback and feedforward information for perception and control
   and contextualizes and studies the use of amortization and
   semi-amortization in these settings.
