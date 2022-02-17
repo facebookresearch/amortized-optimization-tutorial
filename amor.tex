@@ -1190,11 +1190,20 @@ beyond this scoped setting, which we note here.
 \label{sec:extensions:domain}
 \subsubsection{Deterministic $\rightarrow$ stochastic optimization}
 \label{sec:extensions:sto}
+\begin{wrapfigure}{r}{1.8in}
+\vspace{-12mm}
+\includegraphics[width=\linewidth]{fig/gaussian.pdf}
+\captionsetup{font={small}}
+\caption{Optimizing \cref{eq:maxent}.}
+\vspace{-3mm}
+\end{wrapfigure}
 A crucial extension that comes up in the control setting in
 \cref{sec:apps:ctrl} is from optimization over deterministic vector
 spaces $\gY$ into \emph{stochastic optimization} settings
-where $\gY$ represents a space of distributions
-so that $y\in\gY$ represents a distribution.
+where $\gY$ represents a space of distributions.
+This generally turns $y\in\gY$ from a vector in Euclidean space
+into a representation of a distribution and can make amortization
+more challenging.
 
 \textbf{Transforming parameterized stochastic problems
   back into deterministic ones.}
@@ -1219,29 +1228,34 @@ When $\lambda$ is not an unconstrained real space, the
 differentiable projections we will discuss in \cref{sec:constraints}
 could be used to transform $\lambda$ back into this form for amortization.
 
-\textbf{Optimizing over densities.}
-We will lastly mention here the interesting note that
-some settings also optimize over the space of densities.
-For example, as presented in \citet[p.~47]{guiasu1985principle}
-and extended to manifolds in \citet[\S6.2]{pennec2006intrinsic},
-$\gN(\mu, \Sigma)$ can be characterized
-by the density $g^\star(\mu, \Sigma)$ with maximal entropy
-constrained to have mean $\mu$ and covariance $\Sigma$ by solving
-the optimization problem over continuous densities $g$:
+\textbf{Optimizing over distributions and densities.}
+More general stochastic optimization settings involve optimizing over
+spaces representing distributions, such as the functional space
+of all continuous densities.
+Many standard probability distributions can be obtained and
+characterized as the solution to a maximum entropy
+optimization problem and is explored in
+\citet[Ch.~12]{cover2006elements},
+\citet[p.~47]{guiasu1985principle}, and
+\citet[\S6.2]{pennec2006intrinsic}.
+For example, a Gaussian distribution $\gN(\mu, \Sigma)$
+solves the following constrained maximum entropy
+optimization problem over the space of continuous densities $\gP$:
 \begin{equation}
-  g^\star(\mu, \Sigma)\in \argmin_g H[g]\; \subjectto\; \E_g[x] = \mu\; {\rm and}\; \E_g[xx^\top] = \Sigma.
+  p^\star(\mu, \Sigma)\in \argmax_{p\in\gP} \HH_p[X]\; \subjectto\; \E_p[X] = \mu\; {\rm and}\; \Var_p[X] = \Sigma,
   \label{eq:maxent}
 \end{equation}
-% TODO: better-define?
-The solution of $g^\star$ being a Gaussian density can be
-obtained by taking the Lagrangian with respect to the density $g$.
-Variations and generalizations of this setting leads to
-other optimization problems over densities with non-trivial solutions.
-We will not consider amortizing this setting,
-but one reasonable approximation to start could
-be to approximate the density $g_\theta$ with an expressive
-family of densities parameterized by $\theta$, and then
-amortize the parametric optimization problems induced by those.
+where $\HH_p[X]\defeq\int p(x)\log p(x){\rm d}x$ is the \emph{differential entropy}
+and the constraints are on the mean $\E_p[X]$ and covariance $\Var_p[X]$.
+\citet[Theorem~8.6.5]{cover2006elements} prove that the closed-form solution
+of $p^\star$ is the Gaussian density.
+This Gaussian example has a closed-form solution and therefore does not
+need amortization, variations of it may not have closed-form solutions
+and could benefit from amortization.
+While we do not study amortizing these problems, in some cases it may
+be possible to again transform them back into deterministic optimization problems
+over Euclidean space for amortization by approximating the density $g_\theta$
+with an expressive family of densities parameterized by $\theta$.
 
 \subsubsection{Unconstrained $\rightarrow$ constrained optimization}
 \label{sec:constraints}
