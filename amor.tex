@@ -50,7 +50,7 @@ backref=page
 
 \usepackage{wrapfig}
 \usepackage{tikz}
-\usetikzlibrary{matrix}
+\usetikzlibrary{arrows.meta, arrows, calc, matrix}
 
 \newcommand{\cblock}[3]{
   \hspace{-1.5mm}
@@ -556,7 +556,7 @@ and in this section we will take a closer look at where the
 second-order terms come from and discuss alternatives.
 \citet{finn2017model} observed these second-order terms and
 the following derivation is similar to the ones that
-\citet[Section 5]{nichol2018first} and \citet{weng2018metalearning}
+\citet[\S5]{nichol2018first} and \citet{weng2018metalearning}
 perform by composing the model with the loss, as we will expand on
 in \cref{eq:grad-loss-grad}. We focus only on the
 model derivatives.
@@ -722,7 +722,7 @@ regression-based learning solves
 \begin{equation}
   \argmin_\theta \gL_{\rm reg}(\hat y_\theta) \qquad
   \gL_{\rm reg}(\hat y_\theta) \defeq
-  \E_{x \sim p(x)} ||y^\star(x) - \hat y_\theta(x)||_2^2.
+  \E_{x \sim p(x)} \|y^\star(x) - \hat y_\theta(x) \|_2^2.
 \label{eq:reg-loss}
 \end{equation}
 $\gL_{\rm reg}$ is typically optimized with an adaptive first-order
@@ -1058,7 +1058,7 @@ $\hat y^0_\theta$ makes it easy for the model to
 \emph{globally} (!) solve the problem
 \begin{equation}
   \label{eq:iMAML}
-  \hat y_\theta(x) \in \argmin_y f(y; x) + \frac{\lambda}{2}||y-\hat y^0_\theta||_2^2,
+  \hat y_\theta(x) \in \argmin_y f(y; x) + \frac{\lambda}{2}\|y-\hat y^0_\theta\|_2^2,
 \end{equation}
 where the parameter $\lambda$ that encourages the
 solution to stay close to some initial iterate.
@@ -1289,20 +1289,46 @@ from the box $[-1,1]^n$ to the reals $\R^n$ by using
 the $\tanh$ to project from $\R^n$ to $[-1,1]^n$.
 \Cref{sec:apps:sphere} also uses a differentiable projection from $\R^n$
 onto the sphere $\gS^{n-1}$.
-These projections can be generally defined by the following:
+We define these as: \\
 
+\noindent
+\begin{minipage}{0.65\textwidth}
 \begin{definition}
-  A \emph{projection} from $\R^n$ onto a set $\gC\subseteq \R^n$ is given by
+  A \emph{projection} from $\R^n$ onto a set $\gC\subseteq \R^n$ is
   \begin{equation}
     \pi_\gC: \R^n\rightarrow \gC \qquad \pi_\gC(x) \in \argmin_{y\in\gC} D(x, y) + \Omega(y),
     \label{eq:proj}
   \end{equation}
   where $D: \R^n\times\R^n\rightarrow \R$ is a distance and $\Omega:\R^n\rightarrow \R$ is
   a regularizer that can ensure invertibility or help spread $\R^n$ more uniformly throughout $\gC$.
-  We omit the dependence of $\pi$ on the choice of $D$, $\Omega$, and $\gC$
+  A \emph{(sub)differentiable projection} has (sub)derivatives $\nabla_x \pi_\gC(x)$.
+  We sometimes omit the dependence of $\pi$ on the choice of $D$, $\Omega$, and $\gC$
   when they are given by the surrounding context.
   \label{def:proj}
 \end{definition}
+\end{minipage}
+\begin{minipage}{0.35\textwidth}
+  \hspace{8mm}
+\begin{tikzpicture}[every path/.style={thick}]
+  \path[fill=linkcolor!20] (0,0) coordinate(p1) -- ++(20:2) coordinate(p2) -- ++(-55:2.5)
+    coordinate(p3) -- ++(-120:2.) coordinate(p4) --  ++(160:2.5) coordinate(p5);
+ \node at (barycentric cs:p1=1,p2=1,p3=1,p4=1,p5=1) {$\gC$};
+ \foreach \X [count=\Y] in {2,...,6} {
+   \ifnum\X=6
+     \path (p\Y) -- (p1) coordinate[pos=0.](a\Y) coordinate[pos=1.](a1)
+       coordinate[pos=0.5](m1);
+     \draw (a\Y) -- (a1);
+  \else
+     \path (p\Y) -- (p\X) coordinate[pos=0.](a\Y) coordinate[pos=1.](a\X)
+       coordinate[pos=0.5](m\X);
+     \draw (a\Y) -- (a\X);
+  \fi}
+ \draw[dashed] (m3) -- ($ (m3)!1.2cm!90:(p3) $) node[pos=1.2]{$x$}; %node[pos=-.3]{$\pi_\gC(x)$};
+ \filldraw[black] (m3) circle(2pt);
+ \filldraw[black] ($ (m3)!1.2cm!90:(p3) $) circle(2pt);
+ \node[xshift=1pt,anchor=west] at (m3) {$\pi_\gC(x)$};
+\end{tikzpicture}
+\end{minipage} \\
 
 \textbf{Lack of idempotency.} In linear algebra, a projection is defined to
 be \emph{idempotent}, \ie applying the projection twice gives the same result
@@ -1313,33 +1339,27 @@ and often $\pi_\gC\circ \pi_\gC\neq \pi_\gC$
 as the regularizer $\Omega$ may cause points that are already on $\gC$
 to move to a different position on $\gC$.
 
-% TODO: Projection fig?
-\textbf{Projections for constrained amortization.}
+\textbf{Differentiable projections for constrained amortization.}
 These can be used to cast \Cref{eq:opt-constrained} as the unconstrained
 problem \cref{eq:opt} by composing the objective with a projection
 $f\circ \pi_\gC$.
-\emph{(Sub)differentiable} projections usefully provide us with (sub)derivatives
-of the projection $\pi_\gC(x)$ with respect to the input $x$ and enable
-gradient-based learning through the projection and is the most easily attainable
-when the projection has an explicit closed-form solution.
-We can start to get an intuition for differentiable projections by first
-seeing the ReLU, sigmoid, and softmax as differentiable projections
-that also turn out to be convex optimization problems.
-\citet[2.4.4]{amos2019differentiable} further discusses these
+(Sub)differentiable projections enable gradient-based learning through the projection
+and is the most easily attainable when the projection has an explicit closed-form solution.
+For intuition, we first interpret the ReLU, sigmoid, and softmax as
+differentiable projections that solve convex optimization problems
+in the form of \cref{eq:proj}.
+\citet[\S2.4.4]{amos2019differentiable} further discusses these
 and proves them using the KKT conditions.
 
-\begin{proposition}
-  The ReLU, defined by $f(x) \defeq \max\{0, x\}$,
+\begin{itemize}
+\item The \emph{ReLU}, defined by $f(x) \defeq \max\{0, x\}$,
   projects a point $x\in\R^n$ onto the non-negative
   orthant $\R^n_+$ as
   \begin{equation}
-    \pi(x) \in \argmin_y \;\; \frac{1}{2}||x-y||_2^2 \;\; \st \;\; y\geq 0.
+    \pi(x) \in \argmin_y \;\; \frac{1}{2}\|x-y\|_2^2 \;\; \st \;\; y\geq 0.
     \label{eq:relu-proj}
   \end{equation}
-\end{proposition}
-
-\begin{proposition}
-  The sigmoid or logistic function, defined by $f(x) \defeq (1+e^{-x})^{-1}$,
+\item The \emph{sigmoid} or \emph{logistic} function, defined by $f(x) \defeq (1+e^{-x})^{-1}$,
   projects a point $x\in\R^n$ onto
   the interior of the unit hypercube $(0,1)^n$ as
   \begin{equation}
@@ -1352,10 +1372,7 @@ and proves them using the KKT conditions.
   \end{equation}
   is the
   binary entropy function.
-\end{proposition}
-
-\begin{proposition}
-  The softmax, defined by $f(x)_j = e^{x_j} / \sum_i e^{x_i}$,
+\item The \emph{softmax}, defined by $f(x)_j = e^{x_j} / \sum_i e^{x_i}$,
   projects a point $x\in\R^n$ onto
   the interior of the $(n-1)$-simplex
   $$\Delta_{n-1}=\{p\in\R^n\; \vert\; 1^\top p = 1 \; \; {\rm and} \;\; p \geq 0 \}$$
@@ -1365,30 +1382,91 @@ and proves them using the KKT conditions.
     \label{eq:simplex-proj}
   \end{equation}
   where $H(y) = -\sum_i y_i \log y_i$ is the entropy function.
-\end{proposition}
+\end{itemize}
 
-In all of these cases, the projections have explicit closed-form
-solutions given by the standard (sub)differentiable operations
-that we use in machine learning.
-Thus the projection can be simply replaced by the standard operation
-and differentiated through for learning.
+Going beyond these, we next cover differentiable projections onto
+\emph{convex cones}, noting that they can also be softened or regularized
+to help with continuity when composed with learning and
+amortization methods.
+\citet{ali2017semismooth,busseti2019solution} discuss
+differentiating the standard Euclidean projections
+onto these, including:
+\begin{itemize}
+\item
+  \begin{minipage}[t]{0.65\textwidth}
+  The \emph{second-order, Lorentz, or ice cream cone}
+  defined by
+  $\gK_{\rm soc}\defeq\{(x,y)\in\R^{m-1}\times\R : \|x\|_2\leq y\}$.
+  The standard Euclidean projection is given in closed form as
+  \begin{equation}
+    \pi(x, y) \defeq
+    \begin{cases}
+      0 & \|x\|_2 \leq -y \\
+      (x,y) & \|x\|_2 \leq y \\
+      \frac{1}{2} (1 + \frac{y}{\|x\|_2}) (x, \|x\|_2) & \textrm{otherwise}.
+    \end{cases}
+  \end{equation}
+  and can be explicitly differentiated.
+  \end{minipage}
+  \hspace{8mm}
+  \begin{minipage}[t]{0.2\textwidth}
+  \vspace{-5mm}
+  \begin{tikzpicture}
+    \draw (0,0) arc (-170:-10:1.5cm and 0.4cm)coordinate[pos=0] (a);
+    \draw (0,0) arc (170:10:1.5cm and 0.4cm)coordinate (b);
+    \draw (a) -- ([yshift=-3cm]$(a)!0.5!(b)$) -- (b);
+  \end{tikzpicture}
+  \end{minipage}
+\item The \emph{positive semidefinite cone} $\gS^m_+$ of the
+  space of $m\times m$ positive semidefinite matrices.
+  The Euclidean projection is obtained in closed-form
+  by projecting the eigenvalues to be non-negative with
+  $\pi(X)\defeq\sum_i\max\{\lambda_i, 0\}q_iq_i^\top$,
+  where the eigenvalue decomposition of $X$ is given by
+  $X=\sum_i\lambda_iq_iq_i^\top$.
+  The derivative can be computed by differentiating
+  through the eigenvalue decomposition and projection
+  of the eigenvalues.
+\item The \emph{exponential cone} is given by
+  \begin{equation}
+  \gK=\{(x,y,z) : x\in\R, y>0, z\geq y\exp(x/y)\}\cup
+  \{(x,0,z): x\leq0, z\geq 0\}.
+  \label{eq:exp-cone}
+  \end{equation}
+  The standard Euclidean projection onto this does
+  \emph{not} have a known closed-form solution
+  but can be computed using a Newton method
+  as discussed in
+  \citep[\S6.3.4]{parikh2014proximal}.
+  \citet{ali2017semismooth} differentiate through
+  this projection using implicit differentiation
+  of the KKT system.
+\end{itemize}
+
+\newpage
+Other projections in machine learning include:
+\begin{itemize}
+\item \citet{adams2011ranking,santa2017deeppermnet,mena2018learning}
+  project onto the \emph{Birkoff polytope} of
+  \emph{doubly stochastic} matrices with row and
+  column sums of 1, \ie
+  $\{X\in\R^{m\times m}: X1=X^\top1=1\}$.
+\item \citet{amos2019limited} project onto the capped
+  simplex for a differentiable top-$k$ layer.
+\item \citet{blondel2019structured} perform structure
+  prediction and learning methods building on Fenchel-Young losses
+  \citep{blondel2020learning} and use projections onto the
+  simplex, unit cube, knapsack polytope, Birkhoff polytope,
+  permutahedron, and order simplex.
+\end{itemize}
+
+In many of these, the projections have explicit closed-form
+solutions that make it easy to compute and differentiate
+through the projections for learning.
 When a closed-form solution to the projection is not available to
 the project, but the projection can be numerically computed,
 projections can often still be differentiated through using
 implicit differentiation.
-\citet{amos2019limited} creates a differentiable top-$k$
-projection layer that implicitly differentiates through projections
-onto the capped simplex.
-% TODO: Expand on these projections?
-\citet{ali2017semismooth,busseti2019solution} differentiate
-through projections onto other convex cones, including
-the second-order cone, positive semidefinite cone,
-and exponential cone.
-\citet{blondel2019structured} consider structure prediction
-and learning that build on Fenchel-Young losses
-\citep{blondel2020learning} and use projections onto the
-simplex, unit cube, knapsack polytope, Birkhoff polytope,
-permutahedron, and order simplex.
 
 \subsubsection{Euclidean $\rightarrow$ non-Euclidean optimization}
 Manifold optimization \citep{absil2009optimization,hu2019brief}
@@ -1731,7 +1809,7 @@ and an input $x\in\gX$, the \emph{sparse code} $y^\star$ is
 typically recovered by solving the optimization problem
 \begin{equation}
   y^\star(x) \in \argmin_y E(y; x) \qquad
-  E(y; x)\defeq \frac{1}{2}||x-W_dy||_2^2 + \alpha||y||_1,
+  E(y; x)\defeq \frac{1}{2}\|x-W_dy\|_2^2 + \alpha\|y\|_1,
   \label{eq:sparse-coding}
 \end{equation}
 where $E$ is the regularized reconstruction energy
@@ -1772,7 +1850,7 @@ that we wish to obtain sparse codes over,
 PSD then regresses the prediction onto the true sparse code $y^\star(x)$
 by solving
 \begin{equation}
-  \argmin_\theta \E_{x\sim p(x)} ||\hat y_\theta(x) - y^\star(x)||_2^2,
+  \argmin_\theta \E_{x\sim p(x)} \|\hat y_\theta(x) - y^\star(x)\|_2^2,
   \label{eq:psd-loss}
 \end{equation}
 where instead of solving for $y^\star(x)$ directly
@@ -2084,9 +2162,9 @@ amortizing their solutions is an activate area of research.
 Fixed-point computations are closely connected to continuous
 unconstrained optimization as any fixed-point problem can be
 transformed into \cref{eq:opt} by optimizing the
-\emph{fixed-point residual} $\gR(y)\defeq||g(y)-y||_2^2$ with
+\emph{fixed-point residual} $\gR(y)\defeq\|g(y)-y\|_2^2$ with
 \begin{equation}
-  y^\star(x)\in\argmin_y ||\gR(y)||_2^2,
+  y^\star(x)\in\argmin_y \|\gR(y)\|_2^2,
   \label{eq:fixed-point-opt}
 \end{equation}
 and conversely \cref{eq:opt} can be transformed into
@@ -2126,7 +2204,7 @@ are the coefficients used to combine the previous iterates.
 A basic AA method sets $\beta=1$ and solves
 \begin{equation}
   \label{eq:aa-alpha}
-  \alpha^\star\defeq \argmin_\alpha ||\gR(y^i)\alpha||_2\; \subjectto\; 1^\top \alpha = 1
+  \alpha^\star\defeq \argmin_\alpha \|\gR(y^i)\alpha\|_2\; \subjectto\; 1^\top \alpha = 1
 \end{equation}
 for $i\in\{t-M,t\}$ with least squares.
 Other methods such as
@@ -2244,7 +2322,7 @@ Learning is performed by optimizing a summed regression-based loss
 that encourages the fixed-point iterations to converge
 as fast as possible by optimizing
 \begin{equation}
-  \argmin_\theta \gL_{\rm HyperAA}(\hat y_\theta) \qquad \gL_{\rm HyperAA}(\hat y_\theta) \defeq \E_{x\sim p(x)} \sum_{t=0}^K w_t ||y^\star - \hat y_\theta^t||_2^2 + \Omega(\alpha^t),
+  \argmin_\theta \gL_{\rm HyperAA}(\hat y_\theta) \qquad \gL_{\rm HyperAA}(\hat y_\theta) \defeq \E_{x\sim p(x)} \sum_{t=0}^K w_t \|y^\star - \hat y_\theta^t\|_2^2 + \Omega(\alpha^t),
   \label{eq:hyperaa-loss}
 \end{equation}
 where $\Omega$ is a regularizer on $\alpha^t$ that is annealed
@@ -2265,7 +2343,7 @@ finding the minimum norm of the residual
 $\gR(y; x)\defeq y-g_\varphi(y;x)$
 as
 \begin{equation}
-  y^\star(x)\in \argmin_x ||\gR(y; x)||_2^2.
+  y^\star(x)\in \argmin_x \|\gR(y; x)\|_2^2.
   \label{eq:deq-opt}
 \end{equation}
 \citet{bai2022neural} propose to use the HyperAnderson Acceleration
@@ -2643,7 +2721,7 @@ Deterministic BC methods often regress onto the expert's
 state-action pairs $(x, \pi^\star(x))$
 sampled some distribution of states $p(x)$ with
 \begin{equation}
-  \argmin_\theta \E_{x\sim p(x)} ||\pi^\star(x)-\pi_\theta(x)||_2^2,
+  \argmin_\theta \E_{x\sim p(x)} \|\pi^\star(x)-\pi_\theta(x)\|_2^2,
   \label{eq:bc}
 \end{equation}
 where, for example, the model $\pi_\theta$ could
@@ -2931,7 +3009,7 @@ and the decoder can be learned by regressing
 onto ground-truth control sequences $u^\star(x)$ with
 \begin{equation}
   \argmin_\theta \gL_{\rm DCEM}(\hat u_{1:H}(\cdot; \theta)) \qquad \gL_{\rm DCEM}(\hat u_{1:H}(\cdot; \theta))\defeq \E_{x \sim p(x)}
-  ||u^\star_{1:H}(x) - \hat u_{1:H}(x; \theta)||_2^2.
+  \|u^\star_{1:H}(x) - \hat u_{1:H}(x; \theta)\|_2^2.
 \label{eq:dcem-loss}
 \end{equation}
 \Cref{fig:dcem} visualizes an example on the cartpole task
@@ -3002,7 +3080,7 @@ optimization problems over spheres of the form
   \label{eq:sphere-opt-con}
 \end{equation}
 where $\gS^2$ is the surface of the \emph{unit 2-sphere}
-embedded in $\R^3$ as $\gS^2\defeq \{y\in\R^3 \mid ||y||_2=1\}$
+embedded in $\R^3$ as $\gS^2\defeq \{y\in\R^3 \mid \|y\|_2=1\}$
 and $x$ is some parameterization of the function
 $f: \gS^2\times\gX\rightarrow \R$.
 \Cref{eq:sphere-opt-con} is relevant to physical and
@@ -3023,8 +3101,8 @@ where $\pi_{\gS^2}: \R^3\rightarrow \gS^2$ is the
 Euclidean projection onto $\gS^2$, \ie,
 \begin{equation}
   \begin{aligned}
-    \pi_{\gS^2}(x)\defeq& \argmin_{y\in\gS^2} ||y-x||_2 \\
-     =& \;x/||x||_2.
+    \pi_{\gS^2}(x)\defeq& \argmin_{y\in\gS^2} \|y-x\|_2 \\
+     =& \;x/\|x\|_2.
   \end{aligned}
   \label{eq:pi}
 \end{equation}
