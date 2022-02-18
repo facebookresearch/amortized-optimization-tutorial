@@ -18,9 +18,11 @@ the following plots:
 
 ![](./fig/learning-rl.png?raw=true)
 
+## [gaussian.py](./fig/gaussian.py)
+![](./fig/gaussian.png?raw=true)
+
 ## [ctrl.py](./fig/ctrl.py)
 ![](./fig/ctrl.png?raw=true)
-
 
 ## [imaml.py](./fig/imaml.py)
 ![](./fig/imaml.png?raw=true)
