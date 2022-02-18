@@ -1249,9 +1249,10 @@ where $\HH_p[X]\defeq\int p(x)\log p(x){\rm d}x$ is the \emph{differential entro
 and the constraints are on the mean $\E_p[X]$ and covariance $\Var_p[X]$.
 \citet[Theorem~8.6.5]{cover2006elements} prove that the closed-form solution
 of $p^\star$ is the Gaussian density.
-This Gaussian example has a closed-form solution and therefore does not
-need amortization, variations of it may not have closed-form solutions
-and could benefit from amortization.
+This Gaussian setting therefore does not need amortization as the
+closed-form solution is known and easily computed, but
+more general optimization problems over densities do not necessarily
+have closed-form solutions and could benefit from amortization.
 While we do not study amortizing these problems, in some cases it may
 be possible to again transform them back into deterministic optimization problems
 over Euclidean space for amortization by approximating the density $g_\theta$
@@ -1548,6 +1549,7 @@ and is presented in \citet[Theorem 1B.1]{dontchev2009implicit} as:
   \label{thm:dini}
   Let the roots of $g(y; x)$ define an implicit
   mapping $Y^\star(x)$ given by $Y^\star(x)\defeq\{y \mid g(y;x)=0\}$,
+  % TODO: Check d,n here
   where $x\in\R^d$, $y\in\R^n$, and
   $g: \R^n\times\R^d\rightarrow\R^n$.
   Let $g$ be continuously differentiable in a neighborhood of $(\bar y, \bar x)$
@@ -3495,6 +3497,7 @@ from the shared amortization models here.
 %   Data-driven optimization? \citep{banert2020data}
 %   Uncertainty-aware learning to optimize \citep{you2022bayesian}
 %   \citet{liu2022teaching}
+%   \citet{henaff2019model}
 
 \acks{%
   I would like to thank
