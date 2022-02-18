@@ -822,6 +822,8 @@ Choosing between the regression- and objective-based losses
 is challenging as they measure the solution quality in
 different ways and have different convergence and
 locality properties.
+\citet{liu2022teaching} experimentally compare these
+losses for learning to optimize with fully-amortized set-based models.
 \Cref{fig:reg-contours} illustrates that the $\ell_2$-regression
 loss (the black contours) ignores the objective
 values (the purple contours) and thus gives the same loss
@@ -3488,7 +3490,8 @@ exploration of semi-amortized models:
 \end{itemize}
 
 \section{Related work}
-\subsection{Other tutorials and reviews}
+\subsection{Other tutorials, reviews, and discussions
+  on amortized optimization}
 My goal in writing this tutorial was to provide a perspective
 of existing amortized optimization methods for learning
 to optimize with a categorization of the
@@ -3527,6 +3530,13 @@ that I am aware of are excellent resources:
   metric-based, model-based, and optimization-based approaches,
   and discusses approximations to the second-order derivatives
   that come up with MAML.
+\item \citet{hospedales2020meta} is a review focused on meta-learning,
+  where they categorize meta-learning components into a
+  meta-representation, meta-optimizer, and meta-objective.
+  The most relevant connections to amortization here are that
+  the meta-representation can instantiate an
+  amortized optimization problem that is solved with the
+  meta-optimizer.
 \item \citet{kim2020deep} is a dissertation on deep
   latent variable models for natural language
   and contextualizes and studies the use of amortization and
@@ -3535,13 +3545,6 @@ that I am aware of are excellent resources:
   feedback and feedforward information for perception and control
   and contextualizes and studies the use of amortization and
   semi-amortization in these settings.
-\item \citet{hospedales2020meta} is a review focused on meta-learning,
-  where they categorize meta-learning components into a
-  meta-representation, meta-optimizer, and meta-objective.
-  The most relevant connections to amortization here are that
-  the meta-representation can instantiate an
-  amortized optimization problem that is solved with the
-  meta-optimizer.
 \item \citet{monga2021algorithm} is a review on
   algorithm unrolling that starts with the unrolling
   in LISTA \citep{gregor2010learning} for amortized
@@ -3551,6 +3554,12 @@ that I am aware of are excellent resources:
   semi-amortized models, this review also considers
   applications and use-cases beyond just
   amortized optimization.
+\item \citet{liu2022teaching} study fully-amortized
+  models based on deep sets \citep{zaheer2017deep}
+  and set transformers \citep{lee2019set}.
+  They consider regression- and objective-based losses
+  for regression, PCA, core-set creation, and
+  supply management for cyber-physical systems.
 \end{itemize}
 
 \subsection{Amortized optimization over discrete domains}
@@ -3613,7 +3622,6 @@ from the shared amortization models here.
 
 % TODO: Other refs?
 %   Data-driven optimization? \citep{banert2020data}
-%   \citet{liu2022teaching}
 %   \citet{henaff2019model}
 
 \acks{%
