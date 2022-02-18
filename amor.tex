@@ -1462,7 +1462,10 @@ Other projections in machine learning include:
   project onto the \emph{Birkoff polytope} of
   \emph{doubly stochastic} matrices with row and
   column sums of 1, \ie
-  $\{X\in\R^{m\times m}: X1=X^\top1=1\}$.
+  \begin{equation}
+    \label{eq:birkhoff}
+    \gB_m\defeq \{X\in\R^{m\times m}: X1=X^\top1=1\}.
+  \end{equation}
 \item \citet{amos2019limited} project onto the capped
   simplex for a differentiable top-$k$ layer.
 \item \citet{blondel2019structured} perform structure
