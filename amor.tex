@@ -2180,6 +2180,9 @@ Here we selectively summarize a few other relevant ideas:
 
 \begin{wrapfigure}{r}{1.8in}
 \includegraphics[width=\linewidth]{fig/fp.pdf}
+\captionsetup{font={footnotesize}}
+\caption{Fixed points of a map.}
+\label{fig:fp}
 \end{wrapfigure}
 
 
@@ -2247,7 +2250,6 @@ into root-finding problems.
 
 \subsubsection{Neural fixed-point acceleration (NeuralFP) and conic optimization with the splitting cone solver (NeuralSCS)}
 \label{sec:apps:neural-fp}
-% TODO: \citep{sjölund2022graphbased} \citep{bastianello2021opreg}
 \emph{Neural fixed-point acceleration} \citep{venkataraman2021neural}
 proposes a semi-amortized method for computing fixed-points
 and use it for convex cone programming.
@@ -2329,6 +2331,35 @@ ${\rm init}_\theta,{\rm acc}_\theta$.
 
 \textbf{Summary.}
 $\gA_{\rm NeuralSCS}\defeq\left(\gR, \gZ, \phi, p(\phi), \hat z_\theta, \gL_{\rm obj}^\Sigma\right)$
+
+\subsubsection{Neural acceleration for matrix factorization (NeuralNMF)}
+\citet{sjolund2022graphbased} use semi-amortized neural acceleration
+to find low-rank factorizations of an input matrix $V$ of the form:
+\begin{equation}
+  V\approx WH^\top, \qquad W\geq 0, H\geq 0,
+  \label{eq:nmf}
+\end{equation}
+where the basis matrix $W\in\R^{m\times r}$ and
+mixture matrix $H\in\R^{n\times r}$ are elementwise
+non-negative matrices of rank $r\leq\min(m,n)$.
+Let $Z=(W,H)$. Taking the norm of the residual of \cref{eq:nmf}
+leads to the optimization formulation
+\begin{equation}
+  Z^\star(V)\in \argmin_{W,H\geq 0} \gN_{\rm NMF}(W, H; V) \qquad
+  \gN_{\rm NMF}(W, H; V)\defeq \frac{1}{2}\|WH^\top - V\|_F^2,
+  \label{eq:nmf-opt}
+\end{equation}
+which can be solved with ADMM \citep{boyd2011distributed}.
+Given a distribution over input matrices $V$,
+\citet{sjolund2022graphbased}, augment a base ADMM
+method with transformer-based initialization and
+acceleration modules.
+This semi-amortized model is learned with an
+objective-based loss and unrolls through
+the ADMM iterations for learning.
+
+\textbf{Summary.}
+$\gA_{\rm NeuralNMF}\defeq\left(\gN_{\rm NMF}, \gZ, V, p(V), \hat Z_\theta, \gL_{\rm obj}^\Sigma\right)$
 
 \subsubsection{HyperAnderson acceleration and
   deep equilibrium models (HyperDEQ)}
