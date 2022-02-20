@@ -2895,14 +2895,16 @@ models for the value approximation.
 The variation in \citet{hafner2019dream} amortizes a model-based
 approximation using the \emph{sum} of the value estimates
 of a model rollout.
-\citet{byravan2021evaluating} perform a large-scale evaluation of
-amortization methods for control and study algorithmic variations
-and generalization capabilities, and consider methods based on
-the stochastic value gradient and behavioral cloning.
+\citet{henaff2019model} explore uncertainty-based regularization to
+amortized policies learned with value gradients.
 \citet{xie2020latent} consider hierarchical amortized optimization
 that combine a higher-level planner based on CEM with a
 lower-level fully-amortized policy learned
 with stochastic value gradients.
+\citet{byravan2021evaluating} perform a large-scale evaluation of
+amortization methods for control and study algorithmic variations
+and generalization capabilities, and consider methods based on
+the stochastic value gradient and behavioral cloning.
 
 \subsubsection{PILCO by \citet{deisenroth2011pilco}}
 PILCO is an early example that uses gradient-based
@@ -3643,7 +3645,6 @@ from the shared amortization models here.
 
 % TODO: Other refs?
 %   Data-driven optimization? \citep{banert2020data}
-%   \citet{henaff2019model}
 
 \acks{%
   I would like to thank
