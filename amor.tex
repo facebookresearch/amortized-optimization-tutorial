@@ -36,10 +36,6 @@ backref=page
 
 \usepackage[nameinlink]{cleveref}
 \Crefname{equation}{Eq.}{Eqs.}
-\Crefname{section}{Sect.}{Sects.}
-\Crefname{appendix}{App.}{Apps.}
-\Crefname{definition}{Def.}{Defs.}
-\Crefname{proposition}{Prop.}{Props.}
 
 \usepackage{xspace}
 \newcommand{\eg}{e.g.\xspace}
@@ -1457,7 +1453,6 @@ onto these, including:
   of the KKT system.
 \end{itemize}
 
-\newpage
 Other projections in machine learning include:
 \begin{itemize}
 \item \citet{adams2011ranking,santa2017deeppermnet,mena2018learning}
@@ -1548,33 +1543,6 @@ better optimizers and insights into the optimization problems
 being solved, especially when this is done on new classes
 of problems beyond the parameter learning problems typically
 considered in machine learning settings.
-
-\subsection{Uncertainty-aware and Bayesian optimization}
-An active research direction combines \emph{uncertainty} estimation
-and amortized optimization:
-
-\textbf{Amortization for Bayesian optimization.}
-\citet{chen2017learning} propose to use an RNN-based
-  amortization in Bayesian optimization settings that
-  predict the optimal solution to commonly used
-  acquisition functions such as the expected improvement
-  and observed improvement.
-  This is powerful as optimizing the acquisition function
-  is often a computational bottleneck.
-\citet{swersky2020amortized} consider amortized
-  Bayesian optimization in discrete spaces and show
-  applications to protein sequence design.
-\citet{ravi2018amortized} propose amortized
-  Bayesian meta-learning for meta-learning with uncertainty
-  estimation over the posterior and show applications to
-  contextual bandits and few-shot learning.
-
-\textbf{Bayesian methods for amortization.}
-\citet{you2022bayesian} investigate \emph{optimizer uncertainty}
-or \emph{Bayesian learning to optimize}.
-This setting explores the uncertainty that an optimizer,
-\eg the amortization model, is the best optimizer for
-the problem.
 
 \subsection{Settings where $p(x)$ changes and can be end-to-end learned}
 We will mostly assume that $p(x)$ is fixed and remains
@@ -1700,6 +1668,32 @@ the objective $g(y;x) \defeq \nabla_y f(y; x)$
 and apply \cref{thm:dini} to compute
 $\D_x y^\star(x)$.
 
+\subsection{Uncertainty-aware and Bayesian optimization}
+An active research direction combines \emph{uncertainty} estimation
+and amortized optimization:
+
+\textbf{Amortization for Bayesian optimization.}
+\citet{chen2017learning} propose to use an RNN-based
+  amortization in Bayesian optimization settings that
+  predict the optimal solution to commonly used
+  acquisition functions such as the expected improvement
+  and observed improvement.
+  This is powerful as optimizing the acquisition function
+  is often a computational bottleneck.
+\citet{swersky2020amortized} consider amortized
+  Bayesian optimization in discrete spaces and show
+  applications to protein sequence design.
+\citet{ravi2018amortized} propose amortized
+  Bayesian meta-learning for meta-learning with uncertainty
+  estimation over the posterior and show applications to
+  contextual bandits and few-shot learning.
+
+\textbf{Bayesian methods for amortization.}
+\citet{you2022bayesian} investigate \emph{optimizer uncertainty}
+or \emph{Bayesian learning to optimize}.
+This setting explores the uncertainty that an optimizer,
+\eg the amortization model, is the best optimizer for
+the problem.
 
 \section{Review and tour of existing research that uses amortized optimization}
 \label{sec:apps}
