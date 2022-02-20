@@ -48,6 +48,8 @@ backref=page
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta, arrows, calc, matrix}
 
+\setlength\tabcolsep{4 pt}
+
 \newcommand{\cblock}[3]{
   \hspace{-1.5mm}
   \begin{tikzpicture}
@@ -1025,6 +1027,7 @@ of predictions on the loss
 that we will further discuss in
 \cref{sec:second-derivatives}.
 
+\newpage
 \subsubsection{Semi-amortized learning with shrinkage and implicit differentiation}
 \begin{wrapfigure}{r}{2.1in}
 \vspace{-5mm}
@@ -1181,8 +1184,7 @@ remains \emph{fixed} the
 entire training time to provide a simple mental model that
 allows us to focus on the core amortization principles
 that consistently show up between applications.
-However in practice, continuous amortization methods go
-beyond this scoped setting, which we note here.
+Here, we cover extensions from this setting that may come up in practice.
 
 \subsection{Extensions of the domain $\gY$}
 \label{sec:extensions:domain}
@@ -1256,6 +1258,7 @@ be possible to again transform them back into deterministic optimization problem
 over Euclidean space for amortization by approximating the density $g_\theta$
 with an expressive family of densities parameterized by $\theta$.
 
+\newpage
 \subsubsection{Unconstrained $\rightarrow$ constrained optimization}
 \label{sec:constraints}
 Amortized constrained optimization problems may naturally arise, for example
@@ -1347,8 +1350,7 @@ For intuition, we first interpret the ReLU, sigmoid, and softargmax as
 differentiable projections that solve convex optimization problems
 in the form of \cref{eq:proj}.
 \citet[\S2.4.4]{amos2019differentiable} further discusses these
-and proves them using the KKT conditions.
-
+and proves them using the KKT conditions:
 \begin{itemize}
 \item The standard Euclidean projection onto the
   \emph{non-negative orthant} $\R^n_+$ is defined by
@@ -1453,7 +1455,7 @@ onto these, including:
   of the KKT system.
 \end{itemize}
 
-Other projections in machine learning include:
+\noindent Other projections in machine learning include:
 \begin{itemize}
 \item \citet{adams2011ranking,santa2017deeppermnet,mena2018learning}
   project onto the \emph{Birkoff polytope} of
@@ -2194,13 +2196,13 @@ Here we selectively summarize a few other relevant ideas:
 
 Continuous fixed-point problems as in \cref{def:fixed}
 are ubiquitous in engineering and science and
-amortizing their solutions is an activate area of research.
-Fixed-point computations are closely connected to continuous
+amortizing their solutions is an activate research area.
+Fixed-point computations are connected to continuous
 unconstrained optimization as any fixed-point problem can be
 transformed into \cref{eq:opt} by optimizing the
-\emph{fixed-point residual} $\gR(y)\defeq\|g(y)-y\|_2^2$ with
+\emph{fixed-point residual norm} $\gR(y)\defeq\|g(y)-y\|_2^2$ with
 \begin{equation}
-  y^\star(x)\in\argmin_y \|\gR(y)\|_2^2,
+  y^\star(x)\in\argmin_y \gR(y),
   \label{eq:fixed-point-opt}
 \end{equation}
 and conversely \cref{eq:opt} can be transformed into
@@ -2404,10 +2406,10 @@ of $g_\varphi(y; x)$ to make a prediction for a task,
 such as regression or classification.
 This fixed-point problem can again be interpreted as
 finding the minimum norm of the residual
-$\gR(y; x)\defeq y-g_\varphi(y;x)$
+$\gR(y; x)\defeq ||y-g_\varphi(y;x)||_2^2$
 as
 \begin{equation}
-  y^\star(x)\in \argmin_x \|\gR(y; x)\|_2^2.
+  y^\star(x)\in \argmin_x \gR(y; x).
   \label{eq:deq-opt}
 \end{equation}
 \citet{bai2022neural} propose to use the HyperAnderson Acceleration
@@ -3092,7 +3094,6 @@ the policy $\pi_\theta$ solving the latent
 optimization problem with DCEM.
 
 \subsubsection{Iterative amortized policy optimization (IAPO) by \citet{marino2020iterative}}
-% TODO: More details, and connections to control as inference?
 IAPO takes a probabilistic view and
 starts with the observation that DPG and SVG methods
 are amortized optimization problems with fully-amortized
