@@ -28,8 +28,8 @@ backref=page
 
 \renewcommand*{\backref}[1]{}
 \renewcommand*{\backrefalt}[4]{%
-  \ifcase #1 \or (Page~#2.)
-  \else (Pages~#2.)
+  \ifcase #1 \or (Cited on page~#2.)
+  \else (Cited on pages~#2.)
   \fi%
 }
 
@@ -812,7 +812,7 @@ solve \cref{eq:opt} from scratch.
 \vspace{-4mm}
 \includegraphics[width=\linewidth]{fig/loss-comp.pdf}\vspace{-3mm}
 \caption{$\gL_{\rm reg}$ contours.}
-\vspace{-3mm}
+\vspace{-5mm}
 \label{fig:reg-contours}
 \end{wrapfigure}
 
@@ -1078,8 +1078,8 @@ They compare it to a Bayesian approach and observe that the insights
 from iMAML can transfer from gradient-based meta-learning to
 other amortized optimization settings.
 
-\subsection{Parameter learning with reinforcement learning
-  or zeroth-order methods}
+\subsection{Parameter learning with zeroth-order methods
+  and reinforcement learning}
 \label{sec:learning:rl}
 
 \begin{wrapfigure}{r}{2.1in}
@@ -1546,6 +1546,34 @@ being solved, especially when this is done on new classes
 of problems beyond the parameter learning problems typically
 considered in machine learning settings.
 
+\subsection{Uncertainty-aware and Bayesian optimization}
+An active research direction combines \emph{uncertainty} estimation
+and amortized optimization:
+
+\textbf{Amortization for Bayesian optimization.}
+\citet{chen2017learning} propose to use an RNN-based
+  amortization in Bayesian optimization settings that
+  predict the optimal solution to commonly used
+  acquisition functions such as the expected improvement
+  and observed improvement.
+  This is powerful as optimizing the acquisition function
+  is often a computational bottleneck.
+\citet{swersky2020amortized} consider amortized
+  Bayesian optimization in discrete spaces and show
+  applications to protein sequence design.
+\citet{ravi2018amortized} propose amortized
+  Bayesian meta-learning for meta-learning with uncertainty
+  estimation over the posterior and show applications to
+  contextual bandits and few-shot learning.
+
+\textbf{Bayesian methods for amortization.}
+\citet{you2022bayesian} investigate \emph{optimizer uncertainty}
+or \emph{Bayesian learning to optimize}.
+This setting explores the uncertainty that an optimizer,
+\eg the amortization model, is the best optimizer for
+the problem.
+
+
 \subsection{Settings where $p(x)$ changes and can be end-to-end learned}
 We will mostly assume that $p(x)$ is fixed and remains
 the same through the entire training process to allow us
@@ -1670,43 +1698,15 @@ the objective $g(y;x) \defeq \nabla_y f(y; x)$
 and apply \cref{thm:dini} to compute
 $\D_x y^\star(x)$.
 
-\subsection{Uncertainty-aware and Bayesian optimization}
-An active research direction combines \emph{uncertainty} estimation
-and amortized optimization:
-
-\textbf{Amortization for Bayesian optimization.}
-\citet{chen2017learning} propose to use an RNN-based
-  amortization in Bayesian optimization settings that
-  predict the optimal solution to commonly used
-  acquisition functions such as the expected improvement
-  and observed improvement.
-  This is powerful as optimizing the acquisition function
-  is often a computational bottleneck.
-\citet{swersky2020amortized} consider amortized
-  Bayesian optimization in discrete spaces and show
-  applications to protein sequence design.
-\citet{ravi2018amortized} propose amortized
-  Bayesian meta-learning for meta-learning with uncertainty
-  estimation over the posterior and show applications to
-  contextual bandits and few-shot learning.
-
-\textbf{Bayesian methods for amortization.}
-\citet{you2022bayesian} investigate \emph{optimizer uncertainty}
-or \emph{Bayesian learning to optimize}.
-This setting explores the uncertainty that an optimizer,
-\eg the amortization model, is the best optimizer for
-the problem.
-
-\section{Review and tour of existing research that uses amortized optimization}
-\label{sec:apps}
-
-\begin{table*}[t]
+\begin{table*}[h]
   \caption{We tour the following applications of amortized optimization.}
   \vspace{3mm}
   \input{rw_table.tex}
   \label{tab:rw}
 \end{table*}
 
+\section{Review and tour of existing research that uses amortized optimization}
+\label{sec:apps}
 We now take a review and tour of the key applications
 of amortized optimization to show some unifying ideas
 that can be shared between all of these topics.
@@ -2882,7 +2882,7 @@ optimization problem with
 \end{equation*}
 
 \textbf{SVG-based amortization for model-free and model-based methods.}
-The SVG view of policy optimization leads to a spectrum of model-free
+SVG-based policy optimization provides a spectrum of model-free
 to model-based algorithms depending on if the value estimate is
 approximated in a model-free or model-based way, \eg with rollouts
 of the true or approximate dynamics.
@@ -2951,10 +2951,9 @@ The methods discussed here
 POPLIN first trains a fully-amortized
 model on a dataset of trajectories with behavioral cloning
 or generative modeling.
-Here we will only consider the BC variant, which
-gives us an \emph{optimal} fully-amortized
-model $\pi_{\theta^\star}$ trained
-for behavior cloning with $\gA_{\rm BC}$.
+Here we only consider the BC variant trained with
+$\gA_{\rm BC}$, which provides an \emph{optimal}
+fully-amortized model $\pi_{\theta^\star}$.
 
 \textbf{Control.}
 Next they explore ways of using the learned policy
@@ -2985,12 +2984,12 @@ is a solution the control problem in \cref{eq:mpc}
 obtained by adapting the policy's parameters to the
 state $x$.
 
-\textbf{Summary.} POPLIN can thus be seen as an extension
+\textbf{Summary.} POPLIN is an extension of
 of behavioral cloning that amortizes control optimization
 problems with
 $\gA_{\rm POPLIN}\defeq (-Q, \gU, \gX, p(x), \pi_\theta, \gL_{\rm reg})$.
-The initial phase is just fully-amortized behavioral cloning,
-and the second phase can be interpreted as a form of semi-amortization
+The initial phase is fully-amortized behavioral cloning.
+The second fine-tuning phase can seen as semi-amortization
 that learns only the initialization $\theta$ and
 finds $\omega$ with CEM, with a regression-based loss $\gL_{\rm reg}$
 that \emph{only} has knowledge of the initial model and does not include
@@ -3081,9 +3080,8 @@ where this is able to learn a latent space that captures the
 cyclic and smoothness structure of the optimal control
 sequence space.
 
-\textbf{Overview.} Learning a latent domain with the
-differentiable cross-entropy method can thus be seen
-as a semi-amortized optimization setup with
+\textbf{Overview.} Learning a latent domain with the differentiable
+cross-entropy method is a semi-amortization method with
 $\gA_{\rm DCEM}\defeq (-Q, \gU, \gX, p(x), \pi_\theta, \gL_{\rm reg})$,
 where the decoder $\varphi_\theta$ shows up from
 the policy $\pi_\theta$ solving the latent
@@ -3671,9 +3669,10 @@ from the shared amortization models here.
   Atlas Wang
   for insightful discussions and feedback
   on this tutorial.
-  Any additional thoughts, insights, corrections,
-  and references are very welcome and encouraged:
-  \url{bda@fb.com}
+  Additional thoughts, insights, corrections,
+  and references are very welcome and encouraged
+  via email at
+  \url{bda@fb.com}.
 }
 
 {\footnotesize\bibliography{amor}}
