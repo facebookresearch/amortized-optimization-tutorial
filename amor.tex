@@ -1129,7 +1129,7 @@ typically on the objective-based loss.
 \label{sec:smooth}
 
 \begin{wrapfigure}{r}{2.1in}
-\vspace{-2mm}
+% \vspace{-2mm}
 \includegraphics[width=\linewidth]{fig/smoothed-loss.pdf}
 \captionsetup{font={small}}
 \caption{\Cref{eq:smooth-loss} with varying $\sigma^2$.}
@@ -1258,13 +1258,13 @@ be possible to again transform them back into deterministic optimization problem
 over Euclidean space for amortization by approximating the density $g_\theta$
 with an expressive family of densities parameterized by $\theta$.
 
-\newpage
 \subsubsection{Unconstrained $\rightarrow$ constrained optimization}
 \label{sec:constraints}
 Amortized constrained optimization problems may naturally arise, for example
 in the convex optimization settings we consider in \cref{sec:apps:convex}
 and for optimization over the sphere we discuss in \cref{sec:apps:sphere}.
-These can often be represented by
+Constrained optimization problems for amortization can often be represented as
+an extension of \cref{eq:opt} with
 \begin{equation}
   y^\star(x) \in \argmin_{y\in\gC} f(y; x),
   \label{eq:opt-constrained}
@@ -1449,13 +1449,13 @@ onto these, including:
   \emph{not} have a known closed-form solution
   but can be computed using a Newton method
   as discussed in
-  \citep[\S6.3.4]{parikh2014proximal}.
+  \citet[\S6.3.4]{parikh2014proximal}.
   \citet{ali2017semismooth} differentiate through
   this projection using implicit differentiation
   of the KKT system.
 \end{itemize}
 
-\noindent Other projections in machine learning include:
+\noindent Other uses of projections in machine learning include:
 \begin{itemize}
 \item \citet{adams2011ranking,santa2017deeppermnet,mena2018learning}
   project onto the \emph{Birkoff polytope} of
@@ -2181,12 +2181,12 @@ Here we selectively summarize a few other relevant ideas:
 \label{sec:apps:convex}
 
 \begin{wrapfigure}{r}{1.8in}
+\vspace{-3mm}
 \includegraphics[width=\linewidth]{fig/fp.pdf}
 \captionsetup{font={footnotesize}}
 \caption{Fixed points of a map.}
 \label{fig:fp}
 \end{wrapfigure}
-
 
 \begin{definition}
   A \emph{fixed point} $y^\star\in\R^n$ of a map
@@ -2197,12 +2197,14 @@ Here we selectively summarize a few other relevant ideas:
 Continuous fixed-point problems as in \cref{def:fixed}
 are ubiquitous in engineering and science and
 amortizing their solutions is an activate research area.
+Let $\gR(y)\defeq g(y)-y$ be the \emph{fixed-point residual}
+with squared norm $\gN(y)\defeq \|\gR(y)\|_2^2$.
 Fixed-point computations are connected to continuous
 unconstrained optimization as any fixed-point problem can be
 transformed into \cref{eq:opt} by optimizing the
-\emph{fixed-point residual norm} $\gR(y)\defeq\|g(y)-y\|_2^2$ with
+residual norms with:
 \begin{equation}
-  y^\star(x)\in\argmin_y \gR(y),
+  y^\star(x)\in\argmin_y \gN(y),
   \label{eq:fixed-point-opt}
 \end{equation}
 and conversely \cref{eq:opt} can be transformed into
@@ -2274,20 +2276,17 @@ next iterate given the past sequence of iterates.
 this model captures standard AA as an instance
 by setting the models equal to the standard update
 that doesn't use learning.
-They then learn these models over a distribution of contexts $p(x)$
-for classes of fixed-point problems with an objective-based loss
-on the residuals that encourages the iterates to converge
-to the fixed-point as fast as possible
+They learn this model to amortize \cref{eq:fixed-point-opt}
+over a distribution of contexts $p(x)$ with an objective-based loss
+that solves
 \begin{equation}
-  \argmin_\theta \E_{x\sim p(x)} \sum_{t=0}^K \gR(\hat y^t(x))
-  / \gR_0(x),
+  \argmin_\theta \E_{x\sim p(x)} \sum_{t=0}^K \gN(\hat y^t_\theta(x)),
   \label{eq:neural-fp-loss}
 \end{equation}
-where $\gR_0$ is a context-specific \emph{normalization factor}
-that helps balance the problem that the scaling of the
-residuals of fixed-point problems can significantly vary.
+where the fixed-point residual norm $\gN$ is scaled by a
+context-specific \emph{normalization factor}.
 
-NeuralSCS \citep{venkataraman2021neural} applies this
+\emph{NeuralSCS} \citep{venkataraman2021neural} applies this
 neural fixed-point acceleration to solve
 \emph{constrained convex cone programs}
 solved by the splitting cone solver (SCS)
@@ -2318,9 +2317,8 @@ the dual variable, and $r \in \mathbb{R}^n$ is the dual residual. The
 set $\mathcal{K} \in \mathbb{R}^m$ is a non-empty convex cone.
 SCS uses the \emph{homogeneous self-dual embedding} to view
 \cref{eq:cone_problem} as a fixed-point computation
-over $\gZ=\R^{n\times m\times 1}$ with the last components being
-a scalar-valued scaling factor with an associated
-residual $\gR(z)$.
+over $\gZ=\R^{n\times m\times 1}$ with a scalar-valued scaling factor
+as the last component.
 
 NeuralSCS proposes a semi-amortized model to predict
 the solution to the fixed point of the self-dual embedding
@@ -2329,10 +2327,10 @@ Their semi-amortized model $\hat z_\theta(\phi)$ takes
 a context $\phi$ as the input and outputs a solution to the
 self-dual embedding by composing the SCS iterations $f$ with
 the learned fixed-point acceleration modules
-${\rm init}_\theta,{\rm acc}_\theta$.
+(${\rm init}_\theta,{\rm acc}_\theta$).
 
 \textbf{Summary.}
-$\gA_{\rm NeuralSCS}\defeq\left(\gR, \gZ, \phi, p(\phi), \hat z_\theta, \gL_{\rm obj}^\Sigma\right)$
+$\gA_{\rm NeuralSCS}\defeq\left(\gN, \gZ, \phi, p(\phi), \hat z_\theta, \gL_{\rm obj}^\Sigma\right)$
 
 \subsubsection{Neural acceleration for matrix factorization (NeuralNMF)}
 \citet{sjolund2022graphbased} use semi-amortized neural acceleration
@@ -2406,16 +2404,16 @@ of $g_\varphi(y; x)$ to make a prediction for a task,
 such as regression or classification.
 This fixed-point problem can again be interpreted as
 finding the minimum norm of the residual
-$\gR(y; x)\defeq ||y-g_\varphi(y;x)||_2^2$
+$\gN(y; x)\defeq ||y-g_\varphi(y;x)||_2^2$
 as
 \begin{equation}
-  y^\star(x)\in \argmin_x \gR(y; x).
+  y^\star(x)\in \argmin_x \gN(y; x).
   \label{eq:deq-opt}
 \end{equation}
 \citet{bai2022neural} propose to use the HyperAnderson Acceleration
 model and loss to semi-amortize DEQs by learning the initial
 iterate and AA update coefficients, resulting in a setup of the form
-$\gA_{\rm HyperDEQ}\defeq(\gR, \gY, \gX, p(x), \hat y_\theta, \gL_{\rm HyperAA})$.
+$\gA_{\rm HyperDEQ}\defeq(\gN, \gY, \gX, p(x), \hat y_\theta, \gL_{\rm HyperAA})$.
 
 \subsubsection{Comparing NeuralFP and HyperAA}
 Neural fixed-point acceleration (NeuralFP) by \citet{venkataraman2021neural}
@@ -2555,16 +2553,16 @@ for amortization} that we discuss in
   $\gM\defeq(\gX, \gU, p, r)$,
   where $\gX$ are the continuous \emph{states},
   $\gU$ are the continuous \emph{actions} or \emph{controls},
-  $p(x' \mid x, u)$ is the \emph{transition dynamics},
+  $p(x' \mid x, u)$ is the \emph{transition dynamics}
+  (also referred to as the \emph{system}, \emph{model},
+  or \emph{world model}),
   which is a \emph{Markov kernel} providing
   the probability the next state $x'$
   given the current state-action $(x, u)$,
   and $r: \gX\times\gU$ is the \emph{reward function}.
 \end{definition}
-We will scope to methods that control a
-fully-observable and continuous MDPs.
-$p$ is also referred to as the \emph{system},
-\emph{model}, or \emph{world model} of the MDP.
+We scope to methods that control a
+fully-observable and continuous MDP.
 A \emph{policy} $\pi$ that \emph{controls}
 the MDP provides a distribution over actions to sample from
 for every state $x$ and induces \emph{state} and
@@ -2573,8 +2571,7 @@ time step $t$, which can be constrained to start from an initial
 state $x_0$ as $\rho_t(\cdot|x)$.
 In the non-discounted, infinite-horizon case
 an \emph{optimal policy} $\pi^\star$ maximizes the reward over
-all possible rollouts of the MDP, \ie that
-provides the maximum \emph{value} with
+rollouts of the MDP with
 \begin{equation}
   \pi^\star(x)\in \argmax_\pi \E_{x\sim p_{\rm init}(x)} V^\pi(x)
   \qquad
@@ -2604,7 +2601,6 @@ as amortized optimization.
 Instead of amortizing the solution to \cref{eq:Q-opt},
 methods such as \citet{lowrey2018plan,ryu2019caql}
 explicitly solve the max-Q problem.
-We will soon extend \cref{eq:Q-opt} to stochastic policies.
 
 \textbf{Control of deterministic MDPs with deterministic policies.}
 If all of the components of the MDP are known,
