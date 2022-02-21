@@ -76,8 +76,8 @@ learning to optimize over continuous domains}
 \maketitle
 
 \begin{abstract}
-  Optimization is a ubiquitous modeling tool that is often
-  deployed in settings that repeatedly solve similar
+  Optimization is a ubiquitous modeling tool and is often
+  deployed in settings which repeatedly solve similar
   instances of the same problem.
   Amortized optimization methods use learning to predict
   the solutions to problems in these settings.
@@ -111,11 +111,12 @@ learning to optimize over continuous domains}
 
 \newpage
 \section{Introduction}
-\begin{wrapfigure}{r}{2.4in}
+\begin{wrapfigure}{r}{1.8in}
 \vspace{-4mm}
 \includegraphics[width=\linewidth]{fig/opt.pdf}\vspace{-2mm}
+\captionsetup{font={footnotesize}}
 \caption{Illustration of \cref{eq:opt}.}
-\vspace{-12mm}
+\vspace{-2mm}
 \end{wrapfigure}
 We study the use of machine learning
 to improve repeated solves of optimization problems
@@ -134,7 +135,7 @@ assume to be unique, is implicitly defined via
 the optimization procedure and captures the similarities
 between problems with different contexts.
 Parametric optimization problems of this form
-have been theoretically studied for decades
+have been studied for decades
 \citep{bank1982non,fiacco1990sensitivity,shapiro2003sensitivity,klatte2006nonsmooth,bonnans2013perturbation,still2018lectures,fiacco2020mathematical}
 with a large focus on sensitivity analysis.
 This general formulation captures many
@@ -152,7 +153,7 @@ Optimization problems such as \cref{eq:opt} quickly become a
 computational bottleneck in systems.
 \Cref{eq:opt} often does not have a closed-form
 analytic solution and is instead solved with
-approximate numerical methods that iteratively
+approximate numerical methods which iteratively
 search for the solution.
 This computational problem has led to many specialized
 solvers that leverage domain-specific insights to
@@ -166,7 +167,7 @@ improvements and improved convergence.
 \textbf{Overview.} This is a tutorial on \emph{amortized optimization},
 which is the use of machine learning and statistical
 methods to augment and computationally speed up
-optimization methods that solve \cref{eq:opt}.
+optimization methods which solve \cref{eq:opt}.
 We focus on the modeling and learning tools necessary for
 building learning-augmented solvers and extensions of
 classical optimization methods.
@@ -192,14 +193,14 @@ and other applications beyond the scope here.
   \caption{An amortized optimization method learns
     a model $\hat y_\theta$ to predict the minimum
     of an \emph{objective} $f(y;x)$ to a parameterized
-    optimization problem, as in \cref{eq:opt}, that depends on
-    a \emph{context} $x$.
+    optimization problem, as in \cref{eq:opt},
+    which depends on a \emph{context} $x$.
     For example, in control,
     the context space $\gX$ is the state space of the system,
     the domain $\gY\defeq\gU$ is the control space,
     the cost (or negated value) of a state-action
     pair is $f(u; x)\defeq -Q(x,u)$, and the state distribution is $p(x)$.
-    For a state $x$ that the system encounters,
+    For an encountered state $x$,
     many reinforcement learning policies $\pi_\theta(x)\defeq\hat y_\theta(x)$
     amortize the solution to the underlying control problem
     with true solution $y^\star(x)$.
@@ -209,6 +210,7 @@ and other applications beyond the scope here.
   \label{fig:overview}
 \end{figure}
 
+% \newpage
 \section{Amortized optimization foundations for learning to optimize}
 The machine learning, statistics, and optimization
 communities are exploring methods of \emph{learning
@@ -219,7 +221,7 @@ optimization problems across many contexts to approximate
 the solution mapping $y^\star$.
 Amortized optimization is promising because in many applications,
 there are significant correlations and structure between the
-solutions that show up in $y^\star$ that a model can learn.
+solutions which show up in $y^\star$ that a model can learn.
 We follow \citet{shu2017amortized} for defining the core
 foundation of amortized optimization as:
 
@@ -235,31 +237,31 @@ foundation of amortized optimization as:
   $p(x)$ is the \emph{probability distribution over contexts} to optimize,
   $\hat y_\theta: \gX\rightarrow \gY$ is the \emph{amortization model}
   parameterized by $\theta$
-  that is learned by optimizing a \emph{loss}
+  which is learned by optimizing a \emph{loss}
   defined on all the components
   $\gL(f, \gY, \gX, p(x), \hat y_\theta)$.
   \label{def:amor}
 \end{definition}
 
-The objective $f$ and domain $\gY$ often arise from
+The objective $f$ and domain $\gY$ arise from
 the problem setting along with the context space
 $\gX$ and distribution over it $p(x)$, and
 the remaining definitions of the model
-$\hat y_\theta$ and loss $\gL$ are design decisions
-that are often application-specific that we open up
-in \cref{sec:model,sec:learning}.
+$\hat y_\theta$ and loss $\gL$ are application-specific
+design decisions that \cref{sec:model,sec:learning}
+opens up.
 \Cref{fig:overview} illustrates these components.
-The model $\hat y_\theta$ can be seen as a way
-of simultaneously solving and approximating the
-solution mapping $y^\star$, which we usually (informally)
-assume to be almost-everywhere smooth and well-behaved.
+The model $\hat y_\theta$ solves the solution mapping
+$y^\star$ simultaneously for all contexts.
+We also usually (informally) assume the solution mapping
+$y^\star$ to be almost-everywhere smooth and well-behaved.
 The best modeling approach is an open research topic
-as there are many tradeoffs that need to be considered,
+as there are many tradeoffs,
 and many specialized insights from the application domain
 can significantly improve the performance.
 The generalization capacity along with the model's
 convergence guarantees are challenging topics
-that \cref{sec:generalization} covers in more detail.
+which \cref{sec:generalization} covers in more detail.
 
 \textbf{Origins of the term ``amortization'' for optimization.}
 The word ``amortization'' generally means to spread out costs and
@@ -736,11 +738,10 @@ These methods work well when the ground-truth solutions
 are unique and semi-tractable, but can fail otherwise,
 \ie if there are many possible ground-truth
 solutions for a context $x$ or if computing them
-is too intractable and inhibiting.
-After all, in many applications, solving \cref{eq:opt}
-from scratch is computationally expensive and
-amortization methods are meant to help attain
-computational speedups.
+is too intractable.
+After all, solving \cref{eq:opt} from scratch may be
+computationally expensive and amortization methods
+should improve the computation time.
 
 \subsubsection{Objective-based learning}
 \label{sec:learning:grad}
@@ -809,10 +810,10 @@ solve \cref{eq:opt} from scratch.
 
 \subsubsection{Comparing the regression- and objective-based losses}
 \begin{wrapfigure}{r}{1.8in}
-\vspace{-4mm}
+% \vspace{-2mm}
 \includegraphics[width=\linewidth]{fig/loss-comp.pdf}\vspace{-3mm}
 \caption{$\gL_{\rm reg}$ contours.}
-\vspace{-5mm}
+% \vspace{-3mm}
 \label{fig:reg-contours}
 \end{wrapfigure}
 
@@ -832,7 +833,7 @@ re-weighting the dimensions for regression to be more aware
 of the curvature of the objective, but this is often not done.
 The following summarizes some other advantages ($+$) and
 disadvantages ($-$):
-\vspace{6mm}
+\vspace{2mm}
 
 \noindent
 \begin{minipage}[t]{0.5\textwidth}
@@ -878,9 +879,8 @@ where $w_i\in\R_+$ are weights in every iteration $i$
 that give a design choice of how important
 it is for the earlier iterations to produce reasonable
 solutions.
-If the amortization process seeks to find an approximate
-solution as fast as possible, setting all $w_i=1$
-encourages every iterate to be as low as possible.
+For example, setting $w_i=1$ encourages every iterate
+to be low.
 
 Learning iterative semi-amortized methods also has connections to
 sequence learning models that arise in, \eg text, audio,
@@ -918,7 +918,7 @@ of a loss with respect to the model's parameters.
     ;
 \end{tikzpicture}
 \end{center}
-\vspace{-7mm}
+\vspace{-10mm}
 
 The parameterization of \emph{every} iterate $z_\theta^i$ can
 influence the final prediction $\hat y_\theta$ and thus
@@ -997,11 +997,9 @@ the full sequence of model predictions by
 truncating the history of iterates.
 For example, the derivative of a model running
 for $K$ iterations with a truncation length of $H$
-can be approximated by only considering the
-influence the last $H$ iterates
-$\left\{z_\theta^{i}\right\}_{i=K-H}^H$ has on the loss $\gL$,
-and other subsequences of the iterates can
-also be used.
+can be approximated by considering the
+influence of the last $H$ iterates
+$\left\{z_\theta^{i}\right\}_{i=K-H}^H$ on the loss $\gL$.
 
 Truncation significantly helps improve the computational
 and memory efficiency of unrolled optimization procedure
@@ -1024,18 +1022,17 @@ unrolled iterations with other approximations
 that retain the influence of the entire sequence
 of predictions on the loss
 \citep{finn2017model,nichol2018first,lorraine2020optimizing}
-that we will further discuss in
+we will further discuss in
 \cref{sec:second-derivatives}.
 
-\newpage
 \subsubsection{Semi-amortized learning with shrinkage and implicit differentiation}
 \begin{wrapfigure}{r}{2.1in}
-\vspace{-5mm}
+% \vspace{-2mm}
 \includegraphics[width=\linewidth]{fig/imaml.pdf}
 \captionsetup{font={small}}
 \caption{\Cref{eq:iMAML} with varying $\lambda$.}
 \label{fig:imaml}
-\vspace{-5mm}
+\vspace{-3mm}
 \end{wrapfigure}
 
 A huge issue arising in semi-amortized models is that adapting
@@ -1048,9 +1045,9 @@ such as in \citet{chen2019modular,rajeswaran2019meta}.
 Implicit differentiation is an alternative to unrolling through
 the iterations of a semi-amortized model in settings where the
 model is able to successfully solve an optimization problem.
-Here we briefly summarize \emph{Implicit MAML} (iMAML) by \citet{rajeswaran2019meta}
-that notably brings this insight to MAML.
-MAML methods usually only take a few gradient steps which
+Here we briefly summarize \emph{Implicit MAML} (iMAML) by \citet{rajeswaran2019meta},
+which notably brings this insight to MAML.
+MAML methods usually only take a few gradient steps and
 are usually not enough to globally solve \cref{eq:opt},
 especially at the beginning of training.
 \citet{rajeswaran2019meta} observe that adding a penalty
@@ -1082,7 +1079,7 @@ other amortized optimization settings.
   and reinforcement learning}
 \label{sec:learning:rl}
 
-\begin{wrapfigure}{r}{2.1in}
+\begin{wrapfigure}{r}{2.0in}
 \vspace{3mm}
 \includegraphics[width=\linewidth]{fig/learning-rl.pdf}
 \caption{Perturbing $\hat y_\theta$.}
@@ -1129,11 +1126,11 @@ typically on the objective-based loss.
 \label{sec:smooth}
 
 \begin{wrapfigure}{r}{2.1in}
-% \vspace{-2mm}
+\vspace{-2mm}
 \includegraphics[width=\linewidth]{fig/smoothed-loss.pdf}
 \captionsetup{font={small}}
 \caption{\Cref{eq:smooth-loss} with varying $\sigma^2$.}
-\vspace{-1mm}
+% \vspace{-1mm}
 \label{fig:smooth-loss}
 \end{wrapfigure}
 
@@ -1190,20 +1187,13 @@ Here, we cover extensions from this setting that may come up in practice.
 \label{sec:extensions:domain}
 \subsubsection{Deterministic $\rightarrow$ stochastic optimization}
 \label{sec:extensions:sto}
-\begin{wrapfigure}{r}{1.8in}
-\vspace{-12mm}
-\includegraphics[width=\linewidth]{fig/gaussian.pdf}
-\captionsetup{font={small}}
-\caption{Optimizing \cref{eq:maxent}.}
-\vspace{-3mm}
-\end{wrapfigure}
-A crucial extension that comes up in the control setting in
-\cref{sec:apps:ctrl} is from optimization over deterministic vector
-spaces $\gY$ into \emph{stochastic optimization} settings
-where $\gY$ represents a space of distributions.
-This generally turns $y\in\gY$ from a vector in Euclidean space
-into a representation of a distribution and can make amortization
-more challenging.
+A crucial extension is from optimization over deterministic vector
+spaces $\gY$ to \emph{stochastic optimization}
+where $\gY$ represents a space of distributions,
+turning $y\in\gY$ from a vector in Euclidean space
+into a distribution.
+This comes up in \cref{sec:apps:ctrl} for control,
+for example..
 
 \textbf{Transforming parameterized stochastic problems
   back into deterministic ones.}
@@ -1228,13 +1218,20 @@ When $\lambda$ is not an unconstrained real space, the
 differentiable projections we will discuss in \cref{sec:constraints}
 could be used to transform $\lambda$ back into this form for amortization.
 
+\begin{wrapfigure}{r}{2.3in}
+% \vspace{-2mm}
+\includegraphics[width=\linewidth]{fig/gaussian.pdf}
+\captionsetup{font={small}}
+\caption{Optimizing \cref{eq:maxent}.}
+% \vspace{-2mm}
+\end{wrapfigure}
 \textbf{Optimizing over distributions and densities.}
 More general stochastic optimization settings involve optimizing over
 spaces representing distributions, such as the functional space
 of all continuous densities.
 Many standard probability distributions can be obtained and
 characterized as the solution to a maximum entropy
-optimization problem and is explored in
+optimization problem and is explored, \eg, in
 \citet[Ch.~12]{cover2006elements},
 \citet[p.~47]{guiasu1985principle}, and
 \citet[\S6.2]{pennec2006intrinsic}.
@@ -1247,7 +1244,7 @@ optimization problem over the space of continuous densities $\gP$:
 \end{equation}
 where $\HH_p[X]\defeq\int p(x)\log p(x){\rm d}x$ is the \emph{differential entropy}
 and the constraints are on the mean $\E_p[X]$ and covariance $\Var_p[X]$.
-\citet[Theorem~8.6.5]{cover2006elements} prove that the closed-form solution
+\citet[Theorem~8.6.5 and Example~12.2.8]{cover2006elements} prove that the closed-form solution
 of $p^\star$ is the Gaussian density.
 This Gaussian setting therefore does not need amortization as the
 closed-form solution is known and easily computed, but
@@ -2177,7 +2174,8 @@ Here we selectively summarize a few other relevant ideas:
   more trajectories of the existing optimizers.
 \end{enumerate}
 
-\subsection{Amortized fixed point computations and convex optimization}
+\newpage
+\subsection{Amortized fixed-point computations and convex optimization}
 \label{sec:apps:convex}
 
 \begin{wrapfigure}{r}{1.8in}
@@ -3670,8 +3668,7 @@ from the shared amortization models here.
   for insightful discussions and feedback
   on this tutorial.
   Additional thoughts, insights, corrections,
-  and references are very welcome and encouraged
-  via email at
+  and references are very welcome:
   \url{bda@fb.com}.
 }
 
