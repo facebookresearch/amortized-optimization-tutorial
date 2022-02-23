@@ -19,6 +19,7 @@ the following plots:
 ![](./fig/learning-rl.png?raw=true)
 
 ## [maxent.py](./fig/maxent.py)
+![](./fig/maxent.gif?raw=true)
 ![](./fig/maxent.png?raw=true)
 
 ## [ctrl.py](./fig/ctrl.py)
