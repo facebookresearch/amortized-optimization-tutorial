@@ -18,8 +18,8 @@ the following plots:
 
 ![](./fig/learning-rl.png?raw=true)
 
-## [gaussian.py](./fig/gaussian.py)
-![](./fig/gaussian.png?raw=true)
+## [maxent.py](./fig/maxent.py)
+![](./fig/maxent.png?raw=true)
 
 ## [ctrl.py](./fig/ctrl.py)
 ![](./fig/ctrl.png?raw=true)
