@@ -1,4 +1,6 @@
 *.pdf
+*.gif
+*.png
 !**/fig/**/*.pdf
 *.out
 *.toc
