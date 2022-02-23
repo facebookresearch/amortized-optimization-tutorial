@@ -115,7 +115,9 @@ def plot(t):
 # jitted derivative of the loss with respect to phi
 dloss_dphi = jax.jit(jax.grad(loss, argnums=1))
 
-N = 1000 # Number of discretization points in the domain
+# Number of discretization points in the domain
+# Decrease this to run faster
+N = 1000
 
 # The domain of the unprojected distribution
 x_unproj = jnp.linspace(-5.0, 5.0, N)
@@ -125,6 +127,7 @@ x, y = compute_dist(x_unproj, phi)
 entrs.append(entr(x,y))
 print(f'entr={entr(x,y):.2f} (mean={mean(x, y):.2f} std={std(x,y):.2f})')
 
+# The step size can be much larger but it's set to this for the animation.
 n_step = 100
 step_size = 0.13
 for t in range(n_step):
@@ -136,5 +139,8 @@ for t in range(n_step):
     print(f'entr={entr(x,y):.2f} (mean={mean(x, y):.2f} std={std(x,y):.2f})')
 
     plot(t)
+
+# By the end, we see that the entropy is the true maximal entropy
+# of the Gaussian of (1/2)log(2\pi)+(1/2) \approx 1.42.
 
 os.system(f'convert -delay 10 -loop 0 {d}/*.png {d}/maxent.gif')
