@@ -1242,7 +1242,7 @@ optimization problem over the space of continuous densities $\gP$:
   p^\star(\mu, \Sigma)\in \argmax_{p\in\gP} \HH_p[X]\; \subjectto\; \E_p[X] = \mu\; {\rm and}\; \Var_p[X] = \Sigma,
   \label{eq:maxent}
 \end{equation}
-where $\HH_p[X]\defeq\int p(x)\log p(x){\rm d}x$ is the \emph{differential entropy}
+where $\HH_p[X]\defeq -\int p(x)\log p(x){\rm d}x$ is the \emph{differential entropy}
 and the constraints are on the mean $\E_p[X]$ and covariance $\Var_p[X]$.
 \citet[Theorem~8.6.5 and Example~12.2.8]{cover2006elements} prove that the closed-form solution
 of $p^\star$ is the Gaussian density.
@@ -3653,6 +3653,7 @@ from the shared amortization models here.
 \acks{%
   I would like to thank
   Nil-Jana Akpinar,
+  Alfredo Canziani,
   Samuel Cohen,
   Georgina Hall,
   Boris Knyazev,
