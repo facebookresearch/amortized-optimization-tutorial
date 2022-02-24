@@ -37,7 +37,7 @@ the following plots:
 ![](./fig/loss-comp.png?raw=true)
 
 ## [smoothed-loss.py](./fig/smoothed-loss.py)
-![](./fig/loss-comp.png?raw=true)
+![](./fig/smoothed-loss.png?raw=true)
 
 # Licensing
 The source code for this tutorial, plots, and
