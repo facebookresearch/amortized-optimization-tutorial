@@ -15,12 +15,12 @@ plt.rcParams.update({
     "font.sans-serif": ["Computer Modern Roman"]})
 plt.style.use('bmh')
 
-phi = jnp.array([0., 1.5, .7, 6.]) # Parameters to learn
+phi = jnp.array([0., .7, 4.]) # Parameters to learn
 
 @jax.jit
 def compute_dist(x, phi):
     # Compute values at the discretized points in the domain
-    v = jnp.exp(-0.5*((x-phi[0])/phi[1])**2 + phi[2]*jnp.sin(x*phi[3]))
+    v = jnp.exp(-0.5*(x-phi[0])**2 + phi[1]*jnp.sin(x*phi[2]))
     dx = x[1:]-x[:-1]
     y = v/sum(v[1:]*dx) # Normalize to be a proper distribution.
     flow_x = flow(x, y) # Constrain the mean and variance.
