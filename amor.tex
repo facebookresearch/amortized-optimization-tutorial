@@ -1154,6 +1154,10 @@ and study 1)
 clipping the values of the gradient estimator,
 and 2) parameter optimization with genetic algorithms.
 
+\begin{remark}
+  TODO: Smoothing may change the global minimum.
+\end{remark}
+
 \textbf{Connection to smoothing in reinforcement learning.}
 The Gaussian smoothing of the objective $\gL$ in \cref{eq:smooth-loss}
 is conceptually similar to Gaussian smoothing of the
@@ -3492,6 +3496,15 @@ exploration of semi-amortized models:
   optimizers such as Adam and SGD.
   This enables arbitrary torch modules and optimizers
   to be unrolled and used as as a semi-amortized model.
+\item \href{https://github.com/pytorch/functorch}{functorch}
+  \citep{functorch2021} is a PyTorch library providing
+  composable function transforms for batching and
+  derivative operations, and for creating functional
+  versions of PyTorch modules that can be used in
+  optimization algorithms.
+  All of these operations may arise in the implementation
+  of an amortized optimization method and can become computational
+  bottlenecks if not efficiently implemented.
 \item \href{https://github.com/jump-dev/DiffOpt.jl}{DiffOpt.jl}
   provides differentiable optimization in Julia's JuMP
   \citep{DunningHuchetteLubin2017}.
