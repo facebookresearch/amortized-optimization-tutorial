@@ -2351,11 +2351,13 @@ leads to the optimization formulation
   \gN_{\rm NMF}(W, H; V)\defeq \frac{1}{2}\|WH^\top - V\|_F^2,
   \label{eq:nmf-opt}
 \end{equation}
-which can be solved with ADMM \citep{boyd2011distributed}.
+which can be solved with ADMM \citep{boyd2011distributed}
+using alternating steps on $H$ and $V$ as done in
+\citet{huang2016flexible}.
 Given a distribution over input matrices $V$,
-\citet{sjolund2022graphbased}, augment a base ADMM
-method with transformer-based initialization and
-acceleration modules.
+\citet{sjolund2022graphbased}, augment the ADMM approach
+from \citet{huang2016flexible} with transformer-based
+initialization and acceleration modules.
 This semi-amortized model is learned with an
 objective-based loss and unrolls through
 the ADMM iterations for learning.
@@ -3582,8 +3584,10 @@ that I am aware of are excellent resources:
 \item \citet{banert2020data} consider theoretical foundations
   for data-driven nonsmooth optimization and show applications
   in deblurring and solving inverse problems for
-  computed tomography and is further developed in
-  \citet{banert2021accelerated}.
+  computed tomography. This is further developed in
+  \citet{banert2021accelerated}, which has provable convergence
+  guarantees when the learned component (\eg, the step size)
+  does not deviate too much from a known convergent algorithm.
 \item \citet{marino2021learned} is a dissertation on learned
   feedback and feedforward information for perception and control
   and contextualizes and studies the use of amortization and
@@ -3663,6 +3667,9 @@ This similarity indicates that problem classes typically
 studied by continuation and homotopy methods could also benefit
 from the shared amortization models here.
 
+% TODO: Fast Context Adaptation via Meta-Learning
+
+\newpage
 \acks{%
   I would like to thank
   Nil-Jana Akpinar,
@@ -3674,6 +3681,7 @@ from the shared amortization models here.
   Joe Marino,
   Maximilian Nickel,
   Rajiv Sambharya,
+  Jens Sj\"olund,
   Bartolomeo Stellato,
   Alex Terenin,
   Eugene Vinitsky,
