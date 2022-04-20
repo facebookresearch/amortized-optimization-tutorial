@@ -2543,6 +2543,71 @@ to find the parameters $\theta$.
 $\gA_{\rm RLQP}\defeq (R_{\rm RLQP}, \gS\times\R^m_+, \Phi, p(\phi), \pi_\theta, \gL^{\rm RL}_{\rm obj})$
 
 
+\subsection{Amortized optimal transport}
+\label{sec:apps:ot}
+\textbf{Preliminaries.}
+Optimal transport methods seek to optimally move mass between measures.
+Standard references and introductions include
+\citet{villani2009optimal,santambrogio2015optimal,peyre2019computational},
+and here we will concisely review key concepts.
+Given two measures $(\alpha, \beta)$ supported on spaces $(\gX, gY)$,
+the \emph{Kantorovich problem} (\eg in \citet[Remark~2.13]{peyre2019computational})
+solves
+\begin{equation}
+  W(\alpha, \beta)\defeq \min_{\pi\in\gU(\alpha, \beta)} \int_{\gX\times \gX} c(x,y){\rm d}\pi(x,y),
+  \label{eq:kantorovich}
+\end{equation}
+where the \emph{coupling} $\pi$ is joint distributions over the product of the measures,
+$\gU$ is the set of admissable couplings,
+$c$ is a cost, and
+$W(\alpha, \beta)$ is referred to as the \emph{Wasserstein distance}.
+The \emph{dual} of \cref{eq:kantorovich} (\eg in \citet[Eq.~2.31]{peyre2019computational})
+can be represented by
+\begin{equation}
+  \max_{f} \int_\gX f{\rm d}\alpha + \int_\gY f^* {\rm d}\beta,
+  \label{eq:kantorovich-dual}
+\end{equation}
+over \emph{dual potential functions} $f: \gX \rightarrow \R$ where
+\begin{equation}
+  f^*(y)\defeq\inf_x c(x, y)-f(x)
+  \label{eq:c-transform}
+\end{equation}
+is the \emph{$c$-transform} operation.
+In Euclidean spaces, $f$ turns into a convex function and the $c$-transform
+operation is the standard Legendre-Fenchel transform, also known as
+the convex conjugate.
+
+\subsubsection{Amortized convex conjugates (AmorConj) by \citet{nhan2019threeplayer}}
+\citet{nhan2019threeplayer} study a formulation of Wasserstein GANs which
+has a component amortizing the $c$-conjugate optimization problem in
+\cref{eq:c-transform}.
+They use a fully-amortized model $\hat x_\theta(y)$ with
+objective-based learning.
+
+\textbf{Summary.}
+$\gA_{\rm AmorConj}\defeq (c(\cdot, y)-f(\cdot), \gX, \gY, \beta, \hat x_\theta, \gL_{\rm obj})$.
+
+\subsubsection{Amortized Sliced Wasserstein ($\gA$-SW) by \citet{nguyen2022amortized}}
+{\bf Background.}
+Computing the Wasserstein distance between measures is computationally challenging.
+The \emph{max-sliced} Wasserstein distance \citep{deshpande2019max} approximates
+$W(\alpha, \beta)$ between measures with $\gX=\gY=\R^d$ by linearly projecting
+(or slicing) the atoms of the measures down into 1-dimensional measures
+where the 1-Wasserstein distance has a closed-form solution.
+Max-sliced Wasserstein distances search over slices on the $d$-dimensional
+sphere $\gS^{d-1}$ with
+\begin{equation}
+  \textnormal{Max-SW}(\alpha, \beta)\defeq \max_{\theta\in\gS^{d-1}} W(\theta; \alpha, \beta) \qquad W(\theta; \alpha, \beta)\defeq W(\theta_\#\alpha, \theta_\#\beta),
+  \label{eq:max-sw}
+\end{equation}
+where $\theta_\#\alpha$ is the push-forward measure of $\mu$ through
+$T_\theta(x)=\theta^\top x$.
+
+{\bf Amortized Sliced Wasserstein.} \citet{nguyen2022amortized}
+proposal to amortize \cref{eq:max-sw} over mini-batches $\gD$ of size $m$
+sampled from each measure, resulting in the amortization setting:
+$\gA_{\gA-{\rm SW}}\defeq (W(\theta), \gS^{d-1}, \gX^m\times\gY^m, \gD, \gL_{\rm obj})$.
+
 \subsection{Amortized policy learning for control
   and reinforcement learning}
 \label{sec:apps:ctrl}

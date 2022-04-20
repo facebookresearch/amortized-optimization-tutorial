@@ -21,6 +21,9 @@
 & NeuralNMF & NMF residual & Factorizations & Input matrices & | & $\gL_{\rm obj}^\Sigma$ \\
 & RLQP & $R_{\rm RLQP}$ & QP iterates & QP parameters & | & $\gL^{\rm RL}_{\rm obj}$ \\
 \midrule
+\ref{sec:apps:ot} & AmorConj & $c$-transform obj & ${\rm supp}(\alpha)$ & ${\rm supp}(\beta)$ & Full & $\gL_{\rm obj}$ \\
+  & $\gA$-SW & max-sliced dist & Slices $\Theta$ & Mini-batches & Full & $\gL_{\rm obj}$ \\
+\midrule
 \ref{sec:apps:ctrl} & BC/IL & $-Q$-value & Controls & State space & Full & $\gL_{\rm reg}$ \\
 & (D)DPG/TD3 & | & | & | & | & $\gL_{\rm obj}$ \\
 & PILCO & | & | & | & | & $\gL_{\rm obj}$ \\
