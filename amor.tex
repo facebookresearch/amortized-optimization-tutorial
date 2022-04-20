@@ -743,6 +743,16 @@ After all, solving \cref{eq:opt} from scratch may be
 computationally expensive and amortization methods
 should improve the computation time.
 
+\begin{remark}
+  \Cref{eq:reg-loss} can be extended to other distances
+  defined on the domain, such as non-Euclidean distances
+  or the likelihood of a probabilistic model that predicts
+  a distribution of possible candidate solutions.
+  \citet{adler2017learning} propose to use the Wasserstein
+  distance for learning to predict the solutions to
+  inverse imaging problems.
+\end{remark}
+
 \subsubsection{Objective-based learning}
 \label{sec:learning:grad}
 
@@ -1024,6 +1034,9 @@ of predictions on the loss
 \citep{finn2017model,nichol2018first,lorraine2020optimizing}
 we will further discuss in
 \cref{sec:second-derivatives}.
+Alternatives such as \citep{maclaurin2015gradient,franceschi2017forward}
+Some optimization procedures, such as gradient descent with momentum,
+can also be ``reversed'' without needing to retain the
 
 \subsubsection{Semi-amortized learning with shrinkage and implicit differentiation}
 \begin{wrapfigure}{r}{2.1in}
@@ -1150,12 +1163,16 @@ gradients and zeroth-order evolutionary methods.
 \citet{merchant2021learn2hop} further
 build upon this for learned optimization in
 atomic structural optimization
-and study 1)
-clipping the values of the gradient estimator,
+and study 1) clipping the values of the gradient estimator,
 and 2) parameter optimization with genetic algorithms.
 
 \begin{remark}
-  TODO: Smoothing may change the global minimum.
+  While smoothing can help reduce suboptimal local
+  minima, it may also undesirably change the
+  location of the global minimum.
+  One potential solution to this is to decay
+  the smoothing throughout training, as done
+  in \citet[Appendix~A.1]{amos2021model}.
 \end{remark}
 
 \textbf{Connection to smoothing in reinforcement learning.}
@@ -1170,6 +1187,8 @@ target entropy \citet{haarnoja2018soft} and the learning
 typically starts with a high variance so the policy has a
 broad view of the objective landscape and is then able to focus in
 on a optimal region of the value distribution.
+\citet{amos2021model} uses a fixed entropy decay schedule to
+explicitly control this behavior.
 In contrast, \citet{metz2019understanding,merchant2021learn2hop}
 do not turn the loss into a distribution and more directly
 smooth the loss with a Gaussian with a fixed variance $\sigma^2$
@@ -1525,6 +1544,10 @@ using this formulation, and learn better update rules for
 classification and machine translation tasks.
 Symbolic methods are further studied and scaled in
 \citet{real2020automl,zheng2022symbolic}.
+\citet{maheswaranathan2021reverse} reverse engineer learned
+optimizers and show that they have learned interpretable behavior,
+including momentum, gradient clipping, learning rate schedules,
+and learning rate adaptation.
 
 This direction of work challenges the best accelerated and adaptive
 gradient-based optimizers that are used for machine learning.
@@ -2088,7 +2111,8 @@ Here we selectively summarize a few other relevant ideas:
   to predict parameter updates for meta-learning in multi-task
   learning settings.
 \item Latent embedding optimization (LEO) by \citet{rusu2018meta}
-  performs semi-amortization over a learned latent space.
+  and fast context adaptation (CAVIA) by \citet{zintgraf2019fast}
+  perform semi-amortization over a learned latent space.
   This uses the powerful insight that semi-amortizing over
   the low-level parameters $\varphi$ had a lot of redundancies
   and may not be able to easily capture task-specific
@@ -3266,6 +3290,10 @@ is a quick way of checking the quality of the amortized model,
 If that is the case, then poorly-solved instances can be flagged
 and re-solved with a standard solver for the problem that
 may incur more computational time for that instance.
+\citet{banert2021accelerated,premont2022simple} add provable
+convergence guarantees to semi-amortized models by guarding
+the update and ensuring the learned optimizer does not
+does not deviate too much from a known convergent algorithm.
 
 \subsection{Measuring performance}
 Quantifying the performance of amortization models can even more
@@ -3498,6 +3526,9 @@ exploration of semi-amortized models:
   optimizers such as Adam and SGD.
   This enables arbitrary torch modules and optimizers
   to be unrolled and used as as a semi-amortized model.
+\item \href{https://github.com/metaopt/TorchOpt}{TorchOpt}
+  provides a functional and differentiable optimizer in PyTorch
+  and has higher performance than \verb!higher! in some cases.
 \item \href{https://github.com/pytorch/functorch}{functorch}
   \citep{functorch2021} is a PyTorch library providing
   composable function transforms for batching and
@@ -3511,13 +3542,17 @@ exploration of semi-amortized models:
   provides differentiable optimization in Julia's JuMP
   \citep{DunningHuchetteLubin2017}.
 \item \href{https://github.com/tristandeleu/pytorch-meta}{Torchmeta}
-  \citep{deleu2019torchmeta}
-  and
+  \citep{deleu2019torchmeta} and
   \href{http://learn2learn.net}{learn2learn}
   \citep{arnold2020learn2learn}
   are PyTorch libraries and collection of meta-learning
   algorithms that also focus on making data-loading
   and task definitions easy.
+\item \href{https://github.com/prolearner/hypertorch}{hypertorch}
+  \citep{grazzi2020iteration}
+  is a PyTorch package for computing hypergradients with a
+  large focus on providing computationally efficient approximations
+  to them.
 \end{itemize}
 
 \section{Related work}
@@ -3584,10 +3619,7 @@ that I am aware of are excellent resources:
 \item \citet{banert2020data} consider theoretical foundations
   for data-driven nonsmooth optimization and show applications
   in deblurring and solving inverse problems for
-  computed tomography. This is further developed in
-  \citet{banert2021accelerated}, which has provable convergence
-  guarantees when the learned component (\eg, the step size)
-  does not deviate too much from a known convergent algorithm.
+  computed tomography.
 \item \citet{marino2021learned} is a dissertation on learned
   feedback and feedforward information for perception and control
   and contextualizes and studies the use of amortization and
@@ -3654,6 +3686,8 @@ and learning for symbolic math
 \citep{lample2019deep,charton2021linear,charton2021deep,drori2021neural,dascoli2022deep}
 \citet{salimans2022progressive} progressively amortizes a
 sampling process for diffusion models.
+\citet{schwarzschild2021can} learn recurrent neural networks
+to solve algorithmic problems for prefix sum, mazes, and chess.
 
 \subsection{Continuation and homotopy methods}
 Amortized optimization settings share a similar motivation to
@@ -3666,8 +3700,6 @@ problems along this line.
 This similarity indicates that problem classes typically
 studied by continuation and homotopy methods could also benefit
 from the shared amortization models here.
-
-% TODO: Fast Context Adaptation via Meta-Learning
 
 \newpage
 \acks{%
