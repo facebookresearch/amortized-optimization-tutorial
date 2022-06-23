@@ -46,7 +46,7 @@ backref=page
 
 \usepackage{wrapfig}
 \usepackage{tikz}
-\usetikzlibrary{arrows.meta, arrows, calc, matrix}
+\usetikzlibrary{arrows.meta, arrows, backgrounds, bayesnet, calc, matrix}
 
 \setlength\tabcolsep{4 pt}
 
@@ -210,8 +210,10 @@ and other applications beyond the scope here.
   \label{fig:overview}
 \end{figure}
 
-% \newpage
+\newpage
 \section{Amortized optimization foundations for learning to optimize}
+% TODO: Other graphical visualization of amortization?
+
 The machine learning, statistics, and optimization
 communities are exploring methods of \emph{learning
 to optimize} to obtain fast solvers for \cref{eq:opt}.
@@ -262,6 +264,39 @@ can significantly improve the performance.
 The generalization capacity along with the model's
 convergence guarantees are challenging topics
 which \cref{sec:generalization} covers in more detail.
+
+\begin{wrapfigure}{r}{1.8in}
+\vspace{-8mm}
+\begin{center}
+\begin{tikzpicture}[every path/.style={thick}]
+  \tikzstyle{obs} = [latent,fill=blue!20];
+  \tikzset{plate caption/.append style={below right=-.3cm and -.35cm of #1.south east}};
+  \node[obs] (x) {$x$};
+  \node[obs,right=.6cm of x,fill=red!20] (y) {$y^\star$};
+  \node[latent,above=0.6cm of y] (theta) {$\theta$};
+  \scoped[on background layer]{
+    \plate [inner xsep=.6cm,fill=gray!15,xshift=.5cm] {plate} {(x) (y)} {};
+  };
+  \edge {x} {y};
+  \edge {theta} {y};
+  \node[right=-10mm of plate.east] {$p(x)$};
+\end{tikzpicture}
+\vspace{-4mm}
+\end{center}
+\captionsetup{font={small}}
+\caption{Graphical view of amortized optimization.}
+\label{fig:amor-graph}
+\vspace{-4mm}
+\end{wrapfigure}
+\textbf{Graphical amortized optimization models.}
+I propose to visualize the amortized optimization settings
+with a diagram such as \cref{fig:amor-graph}, which shows how
+the optimal solution $y^\star(x)$ depends on $x$ and captures
+the latent structure across $p(x)$, the distribution of contexts,
+with the parameters $\theta$.
+These diagrams are especially useful for visualizing
+the dependencies and shared structure in specialized
+amortization settings with more components.
 
 \textbf{Origins of the term ``amortization'' for optimization.}
 The word ``amortization'' generally means to spread out costs and
@@ -445,6 +480,8 @@ deep equilibrium models \citep{bai2019deep,bai2020multiscale}.
 
 \subsubsection{Semi-amortized models over a latent space $\gZ$}
 \label{sec:semi-latent}
+% TODO: Better diagram or more intuition on why we would want a latent
+% space, e.g. to search only over the optimal solutions.
 \begin{center}
 \begin{tikzpicture}
   \matrix (m) [
@@ -820,10 +857,10 @@ solve \cref{eq:opt} from scratch.
 
 \subsubsection{Comparing the regression- and objective-based losses}
 \begin{wrapfigure}{r}{1.8in}
-% \vspace{-2mm}
+\vspace{-5mm}
 \includegraphics[width=\linewidth]{fig/loss-comp.pdf}\vspace{-3mm}
 \caption{$\gL_{\rm reg}$ contours.}
-% \vspace{-3mm}
+\vspace{-5mm}
 \label{fig:reg-contours}
 \end{wrapfigure}
 
@@ -1037,6 +1074,7 @@ we will further discuss in
 Alternatives such as \citep{maclaurin2015gradient,franceschi2017forward}
 Some optimization procedures, such as gradient descent with momentum,
 can also be ``reversed'' without needing to retain the
+intermediate states.
 
 \subsubsection{Semi-amortized learning with shrinkage and implicit differentiation}
 \begin{wrapfigure}{r}{2.1in}
@@ -1241,11 +1279,15 @@ When $\lambda$ is not an unconstrained real space, the
 differentiable projections we will discuss in \cref{sec:constraints}
 could be used to transform $\lambda$ back into this form for amortization.
 
+\newpage
 \begin{wrapfigure}{r}{2.3in}
 % \vspace{-2mm}
 \includegraphics[width=\linewidth]{fig/maxent.pdf}
 \captionsetup{font={small}}
-\caption{Optimizing \cref{eq:maxent}.}
+\caption{Optimizing \cref{eq:maxent}.
+  An animated version is available
+  \href{https://github.com/facebookresearch/amortized-optimization-tutorial/blob/main/fig/maxent.gif}{here}.
+}
 % \vspace{-2mm}
 \end{wrapfigure}
 \textbf{Optimizing over distributions and densities.}
@@ -1729,6 +1771,7 @@ $\D_x y^\star(x)$.
   \label{tab:rw}
 \end{table*}
 
+\newpage
 \section{Review and tour of existing research that uses amortized optimization}
 \label{sec:apps}
 We now take a review and tour of the key applications
@@ -1751,6 +1794,8 @@ I defer further background to the original literature.
 \subsection{Amortized variational inference and
   variational autoencoders}
 \label{sec:apps:avi}
+% TODO: Figure of the model/components of the VAE?
+
 Key ideas in amortized optimization originated in the
 variational inference (VI) community's interest in
 approximating intractable densities and integrals
@@ -2543,39 +2588,47 @@ to find the parameters $\theta$.
 $\gA_{\rm RLQP}\defeq (R_{\rm RLQP}, \gS\times\R^m_+, \Phi, p(\phi), \pi_\theta, \gL^{\rm RL}_{\rm obj})$
 
 
-\subsection{Amortized optimal transport}
+\subsection{Amortized $c$-transforms, conjugation,
+  and coupling in optimal transport}
 \label{sec:apps:ot}
 \textbf{Preliminaries.}
 Optimal transport methods seek to optimally move mass between measures.
 Standard references and introductions include
 \citet{villani2009optimal,santambrogio2015optimal,peyre2019computational},
 and here we will concisely review key concepts.
-Given two measures $(\alpha, \beta)$ supported on spaces $(\gX, gY)$,
+Given two measures $(\alpha, \beta)$ supported on spaces $(\gX, \gY)$,
 the \emph{Kantorovich problem} (\eg in \citet[Remark~2.13]{peyre2019computational})
 solves
 \begin{equation}
-  W(\alpha, \beta)\defeq \min_{\pi\in\gU(\alpha, \beta)} \int_{\gX\times \gX} c(x,y){\rm d}\pi(x,y),
+  W(\alpha, \beta)\defeq \min_{\pi\in\gU(\alpha, \beta)} \int_{\gX\times \gY} c(x,y){\rm d}\pi(x,y),
   \label{eq:kantorovich}
 \end{equation}
 where the \emph{coupling} $\pi$ is joint distributions over the product of the measures,
 $\gU$ is the set of admissable couplings,
 $c$ is a cost, and
 $W(\alpha, \beta)$ is referred to as the \emph{Wasserstein distance}.
-The \emph{dual} of \cref{eq:kantorovich} (\eg in \citet[Eq.~2.31]{peyre2019computational})
+The \emph{dual} of \cref{eq:kantorovich}
+(\eg in \citet[Eq.~2.31]{peyre2019computational})
 can be represented by
 \begin{equation}
-  \max_{f} \int_\gX f{\rm d}\alpha + \int_\gY f^* {\rm d}\beta,
+  \max_{f} g(f) \quad \textrm{with dual objective}\quad g(f)\int_\gX f(x){\rm d}\alpha(x) + \int_\gY f^*(y) {\rm d}\beta(y)
   \label{eq:kantorovich-dual}
 \end{equation}
-over \emph{dual potential functions} $f: \gX \rightarrow \R$ where
+over \emph{continuous dual potential functions} $f: \gX \rightarrow \R$ where
 \begin{equation}
   f^*(y)\defeq\inf_x c(x, y)-f(x)
   \label{eq:c-transform}
 \end{equation}
 is the \emph{$c$-transform} operation.
-In Euclidean spaces, $f$ turns into a convex function and the $c$-transform
+In Euclidean spaces, $f$ is a convex function and the $c$-transform
 operation is the standard Legendre-Fenchel transform, also known as
 the convex conjugate.
+When the measures $\alpha,\beta$ are discrete, a coupling $\pi$
+in the primal (\cref{eq:kantorovich}) can be represented as a matrix,
+and the potential $f$ in the dual (\cref{eq:kantorovich-dual})
+can be represented as a finite-dimensional vector and solved with
+a linear programming formulation or sinkhorn iteratinos
+\citep{cuturi2013sinkhorn} in the entropic setting.
 
 \subsubsection{Amortized convex conjugates (AmorConj) by \citet{nhan2019threeplayer}}
 \citet{nhan2019threeplayer} study a formulation of Wasserstein GANs which
@@ -2588,7 +2641,6 @@ objective-based learning.
 $\gA_{\rm AmorConj}\defeq (c(\cdot, y)-f(\cdot), \gX, \gY, \beta, \hat x_\theta, \gL_{\rm obj})$.
 
 \subsubsection{Amortized Sliced Wasserstein ($\gA$-SW) by \citet{nguyen2022amortized}}
-{\bf Background.}
 Computing the Wasserstein distance between measures is computationally challenging.
 The \emph{max-sliced} Wasserstein distance \citep{deshpande2019max} approximates
 $W(\alpha, \beta)$ between measures with $\gX=\gY=\R^d$ by linearly projecting
@@ -2602,11 +2654,33 @@ sphere $\gS^{d-1}$ with
 \end{equation}
 where $\theta_\#\alpha$ is the push-forward measure of $\mu$ through
 $T_\theta(x)=\theta^\top x$.
-
-{\bf Amortized Sliced Wasserstein.} \citet{nguyen2022amortized}
+\citet{nguyen2022amortized}
 proposal to amortize \cref{eq:max-sw} over mini-batches $\gD$ of size $m$
-sampled from each measure, resulting in the amortization setting:
+sampled from each measure.
+
+\textbf{Summary.}
 $\gA_{\gA-{\rm SW}}\defeq (W(\theta), \gS^{d-1}, \gX^m\times\gY^m, \gD, \gL_{\rm obj})$.
+
+\subsubsection{Meta Optimal Transport by \citet{amos2022meta}}
+\label{sec:apps:meta-ot}
+Meta OT speeds up optimal transport solvers by orders of magnitude by
+amortizing the Kantorovich dual computation in \cref{eq:kantorovich-dual}.
+Here, they consider settings where there is a \emph{meta-distribution}
+over the measures to couple and costs to use, \ie $p(\alpha, \beta, c)$
+and map directly from representations of the input measures and cost to
+the optimal dual variables, \ie $f_\theta(\alpha, \beta, c)$.
+They instantiate this idea for optimal transport between discrete
+and continuous measures where the prediction $f_\theta$ warm-starts
+standard dual-based solvers and can then be mapped to the optimal
+primal coupling $\pi^\star$.
+
+\textbf{Summary.}
+$\gA_{\rm MetaOT}\defeq (g, \gF, \gP(\gX\times\gY)\times\gC, \gD, \gL_{\rm obj})$,
+where $g$ is the dual objective,
+$\gF$ represents the space of dual potentials, \ie $f\in\gF$,
+$\gP(\gX\times\gY)$ is a space of distributions over $\gX\times\gY$
+that $\alpha,\beta$ are sampled from, $\gC$ is a representation of the
+space of costs, and $\gD$ is a meta-distribution over $\alpha,\beta,c$.
 
 \subsection{Amortized policy learning for control
   and reinforcement learning}
@@ -3766,7 +3840,6 @@ This similarity indicates that problem classes typically
 studied by continuation and homotopy methods could also benefit
 from the shared amortization models here.
 
-\newpage
 \acks{%
   I would like to thank
   Nil-Jana Akpinar,

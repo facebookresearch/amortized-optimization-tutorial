@@ -3,38 +3,39 @@
 \resizebox{1.1\textwidth}{!}{
 \begin{tabular}{ccccccc}
 \S & Application & Objective $f$ & Domain $\gY$ & Context Space $\gX$ & Amortization model $\hat y_\theta$ & Loss $\gL$ \\ \toprule
-\ref{sec:apps:avi} & VAE & $-\ELBO$ & Variational posterior & Data & Full & $\gL_{\rm obj}$ \\
-& SAVAE/IVAE & | & | & | & Semi & | \\
+\ref{sec:apps:avi} & VAE & $-\ELBO$ & variational posterior & data & full & $\gL_{\rm obj}$ \\
+& SAVAE/IVAE & | & | & | & semi & | \\
 \midrule
-\ref{sec:apps:lista} & PSD & Reconstruction & Sparse code & Data & Full & $\gL_{\rm reg}$ \\
-& LISTA & | & | & | & Semi & | \\
+\ref{sec:apps:lista} & PSD & reconstruction & sparse code & data & full & $\gL_{\rm reg}$ \\
+& LISTA & | & | & | & semi & | \\
 \midrule
-\ref{sec:apps:meta} & HyperNets & Task loss & Model parameters & Tasks & Full & $\gL_{\rm obj}$ \\
-& LM & | & | & | & Semi & $\gL^{\rm RL}_{\rm obj}$ \\
+\ref{sec:apps:meta} & HyperNets & task loss & model parameters & tasks & full & $\gL_{\rm obj}$ \\
+& LM & | & | & | & semi & $\gL^{\rm RL}_{\rm obj}$ \\
 & MAML & | & | & | & | & $\gL_{\rm obj}$ \\
-& Neural Potts & Pseudo-likelihood & | & Protein sequences & Full & $\gL_{\rm obj}$ \\
+& Neural Potts & pseudo-likelihood & | & protein sequences & full & $\gL_{\rm obj}$ \\
 \midrule
-\ref{sec:apps:convex} & NeuralFP & FP residual & FP iterates & FP contexts & Semi & $\gL_{\rm obj}^\Sigma$ \\
+\ref{sec:apps:convex} & NeuralFP & FP residual & FP iterates & FP contexts & semi & $\gL_{\rm obj}^\Sigma$ \\
 & HyperAA & | & | & | & | & $\gL_{\rm reg}^\Sigma$ \\
 & NeuralSCS & CP residual & CP iterates & CP parameters & | & $\gL_{\rm obj}^\Sigma$ \\
 & HyperDEQ & DEQ residual & DEQ iterates & DEQ parameters & | & $\gL_{\rm reg}^\Sigma$ \\
-& NeuralNMF & NMF residual & Factorizations & Input matrices & | & $\gL_{\rm obj}^\Sigma$ \\
+& NeuralNMF & NMF residual & factorizations & input matrices & | & $\gL_{\rm obj}^\Sigma$ \\
 & RLQP & $R_{\rm RLQP}$ & QP iterates & QP parameters & | & $\gL^{\rm RL}_{\rm obj}$ \\
 \midrule
-\ref{sec:apps:ot} & AmorConj & $c$-transform obj & ${\rm supp}(\alpha)$ & ${\rm supp}(\beta)$ & Full & $\gL_{\rm obj}$ \\
-  & $\gA$-SW & max-sliced dist & Slices $\Theta$ & Mini-batches & Full & $\gL_{\rm obj}$ \\
+\ref{sec:apps:ot} & AmorConj & $c$-transform obj & ${\rm supp}(\alpha)$ & ${\rm supp}(\beta)$ & full & $\gL_{\rm obj}$ \\
+  & $\gA$-SW & max-sliced dist & slices $\Theta$ & mini-batches & | & $\gL_{\rm obj}$ \\
+  & Meta OT & dual OT cost & optimal couplings & input measures & | & $\gL_{\rm obj}$ \\
 \midrule
-\ref{sec:apps:ctrl} & BC/IL & $-Q$-value & Controls & State space & Full & $\gL_{\rm reg}$ \\
+\ref{sec:apps:ctrl} & BC/IL & $-Q$-value & controls & state space & full & $\gL_{\rm reg}$ \\
 & (D)DPG/TD3 & | & | & | & | & $\gL_{\rm obj}$ \\
 & PILCO & | & | & | & | & $\gL_{\rm obj}$ \\
-& POPLIN & | & | & | & Full or semi & $\gL_{\rm reg}$ \\
-& DCEM & | & | & | & Semi & $\gL_{\rm reg}$ \\
+& POPLIN & | & | & | & full or semi & $\gL_{\rm reg}$ \\
+& DCEM & | & | & | & semi & $\gL_{\rm reg}$ \\
 & IAPO & | & | & | & | & $\gL_{\rm obj}$ \\
-& SVG & $\D_\gQ$ or $-\gE_Q$ & Control dists & | & Full & $\gL_{\rm obj}$ \\
+& SVG & $\D_\gQ$ or $-\gE_Q$ & control dists & | & full & $\gL_{\rm obj}$ \\
 & SAC & | & | & | & | & $\gL_{\rm obj}$ \\
 & GPS & | & | & | & | & $\gL_{\rm KL}$ \\
 \midrule
-\ref{sec:apps:sphere} & Synthetic Sphere & $c$-convex functions & $\gS^2\rightarrow \R^3$ & RCPM parameters & Full & $\gL_{\rm obj}$ \\
+\ref{sec:apps:sphere} & synthetic sphere & $c$-convex functions & $\gS^2\rightarrow \R^3$ & RCPM parameters & full & $\gL_{\rm obj}$ \\
 \bottomrule
 \end{tabular}}
 
