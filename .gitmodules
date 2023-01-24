@@ -1,0 +1,6 @@
+[submodule "code/vae_submodule"]
+	path = code/vae_submodule
+	url = git@github.com:YannDubs/disentangling-vae.git
+[submodule "code/svg_submodule"]
+	path = code/svg_submodule
+	url = git@github.com:facebookresearch/svg.git
