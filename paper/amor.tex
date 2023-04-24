@@ -1,0 +1,185 @@
+\documentclass[oneside,11pt]{book}
+\usepackage[Lenny]{fncychap}
+\ChNameVar{\Large}
+
+\newcommand{\BlackBox}{\rule{1.5ex}{1.5ex}}  % end of proof
+\newenvironment{proof}{\par\noindent{\bf Proof\ }}{\hfill\BlackBox\\[2mm]}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}{Proposition}
+\newtheorem{remark}{Remark}
+\newtheorem{definition}{Definition}
+
+\usepackage[margin=1.5in]{geometry}
+
+\usepackage{natbib}
+\bibliographystyle{plainnat}
+
+\usepackage{xspace}
+
+\newcommand{\ie}{\emph{i.e.}\xspace}
+\newcommand{\eg}{\emph{e.g.}\xspace}
+\newcommand{\etc}{\emph{etc}\xspace}
+\newcommand{\now}{\textsc{now}}
+
+\input{math_commands.tex}
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\DeclareUnicodeCharacter{1EF3}{\`y}
+\DeclareUnicodeCharacter{0301}{\'{e}}
+
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{enumitem}
+\usepackage{slantsc}
+\usepackage{caption}
+
+\renewcommand\eminnershape{\itshape\scshape}
+
+\usepackage{xcolor}
+\definecolor{linkcolor}{RGB}{74, 102, 146}
+\definecolor{lightpurple}{RGB}{168, 141, 201}
+
+\usepackage[
+colorlinks=true,allcolors=linkcolor,pageanchor=true,
+plainpages=false,pdfpagelabels,bookmarks,bookmarksnumbered,
+backref=page,
+pdfauthor={Brandon Amos},
+pdftitle={Tutorial on amortized optimization},
+]{hyperref}
+
+\renewcommand*{\backref}[1]{}
+\renewcommand*{\backrefalt}[4]{%
+  \ifcase #1 \or (Cited on page~#2.)
+  \else (Cited on pages~#2.)
+  \fi%
+}
+
+
+\usepackage[nameinlink]{cleveref}
+\Crefname{equation}{Eq.}{Eqs.}
+
+\newcommand\pro{\item[$+$]}
+\newcommand\con{\item[$-$]}
+
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{wrapfig}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, arrows, backgrounds, bayesnet, calc, matrix}
+
+\usepackage{listings}
+\definecolor{code_green}{rgb}{0,0.6,0}
+\definecolor{code_gray}{rgb}{0.5,0.5,0.5}
+\definecolor{code_purple}{rgb}{.5, .21, .68}
+
+\lstset{ %
+  backgroundcolor=\color{white},
+  basicstyle=\footnotesize\ttfamily,
+  breaklines=true,
+  captionpos=b,
+  commentstyle=\color{code_green},
+  escapeinside={\%*}{*)},
+  keywordstyle=\color{blue},
+  stringstyle=\color{code_purple},
+  language=Python,
+  columns=fullflexible,
+  numbers=left,
+  xleftmargin=10mm,
+}
+
+% \lstset{basicstyle=\footnotesize\ttfamily, columns=fullflexible, language=Python,
+% numbers=left}
+
+\setlength\tabcolsep{4 pt}
+
+\newcommand{\cblock}[3]{
+  \hspace{-1.5mm}
+  \begin{tikzpicture}
+    [
+    node/.style={square, minimum size=10mm, thick, line width=0pt},
+    ]
+    \node[fill={rgb,255:red,#1;green,#2;blue,#3}] () [] {};
+  \end{tikzpicture}%
+}
+
+\begin{document}
+
+\begin{titlepage}
+\thispagestyle{empty}
+\begin{center}
+\textbf{\Large Tutorial on amortized optimization} \\
+{\large Learning to optimize over continuous spaces} \\~\\
+Brandon Amos, \emph{Meta AI}
+\end{center}
+
+\vspace{0.9cm}
+\noindent\textbf{Abstract.} \\
+Optimization is a ubiquitous modeling tool and is often
+deployed in settings which repeatedly solve similar
+instances of the same problem.
+Amortized optimization methods use learning to predict the solutions to
+problems in these settings, exploiting the shared structure
+between similar problem instances.
+These methods have been crucial in variational inference
+and reinforcement learning and are capable of solving
+optimization problems many orders of magnitudes times faster
+than traditional optimization methods that do not use amortization.
+This tutorial presents an introduction to the amortized optimization
+foundations behind these advancements and overviews
+their applications in variational inference, sparse coding,
+gradient-based meta-learning, control, reinforcement learning,
+convex optimization, optimal transport, and deep equilibrium networks.
+The source code for this tutorial is available at
+{\footnotesize\url{https://github.com/facebookresearch/amortized-optimization-tutorial}}.
+\end{titlepage}
+
+\setcounter{tocdepth}{1}
+\tableofcontents
+
+\include{chapters/1-intro}
+\include{chapters/2-foundations}
+\include{chapters/3-applications}
+\include{chapters/4-implementation}
+\include{chapters/5-discussion}
+
+\newpage
+\section*{Acknowledgments}
+I would like to thank
+Nil-Jana Akpinar,
+Alfredo Canziani,
+Samuel Cohen,
+Georgina Hall,
+Misha Khodak,
+Boris Knyazev,
+Hane Lee,
+Joe Marino,
+Maximilian Nickel,
+Paavo Parmas,
+Rajiv Sambharya,
+Jens Sj\"olund,
+Bartolomeo Stellato,
+Alex Terenin,
+Eugene Vinitsky,
+and
+Atlas Wang
+for insightful discussions
+and feedback on this tutorial.
+I am also grateful to the anonymous FnT reviewers
+who gave a significant amount of helpful and
+detailed feedback.
+
+{\footnotesize\bibliography{amor}}
+
+\end{document}
+
+
+%%% Local Variables:
+%%% coding: utf-8
+%%% mode: latex
+%%% TeX-master: "amor.tex"
+%%% LaTeX-biblatex-use-Biber: True
+%%% End:

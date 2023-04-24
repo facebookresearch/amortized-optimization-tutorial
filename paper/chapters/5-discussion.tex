@@ -1,0 +1,427 @@
+\chapter{Discussion}
+\label{sec:discussion}
+Many of the specialized methods discuss tradeoffs and
+limitations within the context of their application,
+and more generally papers such as
+\citet{chen2021learning,metz2021gradients}
+provide even deeper probes into general paradigms for
+learning to optimize.
+This section emphasizes a few additional discussion points
+around amortized optimization.
+
+\section{Surpassing the convergence rates of
+  classical methods}
+\label{sec:convergence}
+Theoretical and empirical optimization research often focuses
+on discovering algorithms with theoretically strong convergence
+rates in general or worst-case scenarios.
+Many of the algorithms with the best convergence
+rates are used as the state-of-the-art algorithms in practice,
+such as momentum and acceleration methods.
+Amortized optimization methods can surpass the results
+provided by classical optimization methods because they
+are capable of tuning the initialization and updates
+to the best-case scenario within the distribution of
+contexts the amortization model is trained on.
+For example, the fully amortized models for amortized variational
+inference and model-free actor-critic methods for RL
+presented in \cref{sec:impl:eval} solve
+the optimization problems \emph{in constant time} with just
+a single prediction of the solution from the context without
+even looking at the objective!
+Further theoretical characterizations of this are provided
+in \citet{khodak2022learning} and related literature on
+algorithms with predictions.
+
+\section{Generalization and convergence guarantees}
+\label{sec:generalization}
+Despite having powerful successes of amortized optimization in
+some settings, the field struggles to bring strong success
+in other domains.
+Despite having the capacity of surpassing the convergence rates of
+other algorithms, oftentimes in practice amortized optimization
+methods can deeply struggle to generalize and converge to
+reasonable solutions.
+In some deployments this inaccuracy may be acceptable if there
+is a quick way of checking the quality of the amortized model,
+\eg the residuals for fixed-point and convex problems.
+If that is the case, then poorly-solved instances can be flagged
+and re-solved with a standard solver for the problem that
+may incur more computational time for that instance.
+\citet{banert2021accelerated,premont2022simple} add provable
+convergence guarantees to semi-amortized models by guarding
+the update and ensuring the learned optimizer does not
+does not deviate too much from a known convergent algorithm.
+A practical takeaway is that some models are more likely
+to result in convergent and stable semi-amortized models
+than others.
+For example, the semi-amortized model
+parameterized with gradient descent (which
+has some mild converge guarantees) in \citet{finn2017model}
+is often more stable than the semi-amortized model parameterized
+by a sequential model (without many convergence guarantees)
+in \citep{ravi2016optimization}.
+Other modeling and architecture tricks such as layer
+normalization \citep{ba2016layernorm} help improve the
+stability of amortized optimization models.
+
+\section{Measuring performance}
+Quantifying the performance of amortization models can be even more
+challenging than the choice between using a regression- or
+objective-based loss and is often tied to
+problem-specific metrics that are important.
+For example, even if a method is able to attain low objective values
+in a few iterations, the computation may take \emph{longer} than
+a specialized algorithm or another amortization model that can reach
+the same level of accuracy, thus not making it useful for the
+original goal of speeding up solves to \cref{eq:opt}.
+
+\section{Successes and limitations of amortized optimization}
+While amortized optimization has standout applications in
+variational inference, reinforcement learning, and meta-learning,
+it struggles to bring value in other settings.
+Often, learning the amortized model is computationally more
+expensive than solving the original optimization problems and
+brings instabilities into a higher-level learning or optimization
+process deployed on top of potentially inaccurate solutions
+from the amortized model.
+This section summarizes principles behind successful applications
+of amortized optimization and characterize limitations that
+may arise.
+
+\subsection*{Characteristics of successful applications}
+\begin{itemize}
+\item \textbf{Objective $f(y; x)$ is smooth over the domain $\gY$
+  and has unique solutions $y^\star$.}
+  With objective-based learning, non-convex objectives with
+  few poor local optima are ideal.
+  This behavior can be encouraged with smoothing as is
+  often done for meta-learning and policy learning (\cref{sec:smooth}).
+\item \textbf{A higher-level process should tolerate sub-optimal
+  solutions given by $\hat y$ in the beginning of training.}
+  In variational encoders, the suboptimal bound on the likelihood
+  is still acceptable to optimize the density model's parameters over
+  in \cref{eq:vae-full}.
+  And in reinforcement learning policies,
+  a suboptimal solution to the maximum value problem is still
+  acceptable to deploy on the system in early phases of training,
+  and may even be desirable for the exploration induced by randomly
+  initialized policies.
+\item \textbf{The context distribution $p(x)$ is not too big and
+  well-scoped and deployed on a specialized class of sub-problems.}
+  For example, instead of trying to amortize the solution to
+  \emph{every} possible $\ELBO$ maximization, VAEs
+  amortize the problem only over the dataset the density
+  model is being trained on.
+  And in reinforcement learning, the policy $\pi_\theta$ doesn't
+  try to amortize the solution to \emph{every} possible control
+  problem, but instead focuses only on amortizing the solutions
+  to the control problems on the replay buffer of the
+  specific MDP.
+\item \textbf{In semi-amortized models, parameterizing the initialization
+    and specialized components for the updates.}
+  While semi-amortized models are a thriving research topic,
+  the most successful applications of them:
+  \begin{enumerate}
+  \item \textbf{Parameterize and learn the initial iterate.}
+    MAML \citep{finn2017model} \emph{only} parameterizes the initial
+    iterate and follows it with gradient descent steps.
+    \citet{bai2022neural} parameterizes
+    the initial iterate and follows it with accelerated
+    fixed-point iterations.
+  \item \textbf{Parameterize and learn specialized components of the
+    updates.} In sparse coding, LISTA \citep{gregor2010learning}
+    only parameterized $\{F,G,\beta\}$ instead of the
+    entire update rule.
+    \citet{bai2022neural} only parameterizes $\alpha,\beta$
+    after the initial iterate, and
+    RLQP \citep{ichnowski2021accelerating} only parameterizing $\rho$.
+  \end{enumerate}
+  While using a pure sequence model to update a sequence of
+  iterations is possible and theoretically satisfying as it
+  gives the model the power to arbitrarily update the sequence
+  of iterates, in practice this can be unstable and severely
+  overfit to the training instances.
+  \citet{metz2021gradients} observes, for example, that semi-amortized
+  recurrent sequence models induce chaotic behaviors
+  and exploding gradients.
+\end{itemize}
+
+\subsection*{Limitations and failures}
+\begin{itemize}
+\item \textbf{Amortized optimization does \emph{not} magically solve otherwise
+  intractable optimization problems!}
+  At least not without significant insights.
+  In most successful settings, the original optimization problem can be
+  (semi-)tractably solved for a context $x$ with classical methods,
+  such as using standard black-box variational inference
+  or model-predictive control methods.
+  Intractabilities indeed start arising when repeatedly solving
+  the optimization problem, even if a single one can be reasonably solved,
+  and amortization often thrive in these settings to rapidly solve
+  problems with similar structure.
+\item \textbf{The combination of $p(x)$ and $y^\star(x)$ are too hard
+  for a model to learn.} This could come from $p(x)$ being too
+  large, \eg contexts of every optimization problem in the universe,
+  or the solution $y^\star(x)$ not being smooth or predictable.
+  $y^\star(x)$ may also not be unique, but this is perhaps easier
+  to handle if the loss is carefully set up, \eg objective-based
+  losses handle this more nicely.
+\item \textbf{The domain requires accurate solutions.}
+  Even though metrics that measure the solution quality of $\hat y$
+  can be defined on top of \cref{eq:opt}, amortized methods
+  typically cannot rival the accuracy of standard algorithms
+  used to solve the optimization problems.
+  In these settings, amortized optimization still has the
+  potential at uncovering new foundations and algorithms
+  for solving problems, but is non-trivial to
+  successfully demonstrate.
+  From an amortization perspective, one difficulty of safety-critical
+  model-free reinforcement learning comes from needing to
+  ensure the amortized policy properly optimizes a
+  value estimate that (hopefully) encodes safety-critical
+  properties of the state-action space.
+\end{itemize}
+
+\section{Some open problems and under-explored directions}
+In most domains, introducing or significantly improving amortized
+optimization is extremely valuable and will likely be well-received.
+Beyond this, there are many under-explored directions and
+combinations of ideas covered in this tutorial that can
+be shared between the existing fields using amortized optimization,
+for example:
+
+\begin{enumerate}
+\item \textbf{Overcoming local minima with objective-based losses
+    and connections to stochastic policies.}
+  \Cref{sec:smooth} covered the objective smoothing by
+  \citet{metz2019understanding,merchant2021learn2hop}
+  to overcome suboptimal local minima in the objective.
+  These have striking similarities to stochastic policies
+  in reinforcement learning that also overcome local
+  minima, \eg in \cref{eq:Q-opt-sto-exp}.
+  The stochastic policies, such as in \citet{haarnoja2018soft},
+  have the desirable property of starting with a high variance
+  and then focusing in on a low-variance solution with a
+  penalty constraining the entropy to a fixed value.
+  A similar method is employed in GECO \citep{rezende2018taming}
+  that adjusts a Lagrange multiplier in the ELBO objective
+  to achieve a target conditional log-likelihood.
+  These tricks seem useful to generalize and apply to
+  other amortization settings to overcome poor minima.
+\item \textbf{Widespread and usable amortized convex solvers.}
+  When using off-the-shelf optimization packages such as
+  \citet{diamond2016cvxpy,o2016conic,stellato2018osqp},
+  users are likely solving many similar problem instances
+  that amortization can help improve.
+  \citet{venkataraman2021neural,ichnowski2021accelerating}
+  are active research directions that study adding
+  amortization to these solvers, but they do not scale
+  to the general online setting that also doesn't
+  add too much learning overhead for the user.
+\item \textbf{Improving the wall-clock training time
+    of implicit models and differentiable optimization.}
+  Optimization problems and fixed-point problems
+  are being integrated into machine learning models,
+  such as with differentiable optimization
+  \citep{domke2012generic,gould2016differentiating,amos2017optnet,amos2019differentiable,agrawal2019differentiable,lee2019meta}
+  and deep equilibrium models
+  \citep{bai2019deep,bai2020multiscale}.
+  In these settings, the data distribution the model
+  is being trained on naturally induces a distribution over
+  contexts that seem amenable to amortization.
+  \citet{venkataraman2021neural,bai2022neural}
+  explore amortization in these settings, but often do not
+  improve the wall-clock time it takes to train these models
+  from scratch.
+\item \textbf{Understanding the amortization gap.}
+  \citet{cremer2018inference} study the \emph{amortization gap}
+  in amortized variational inference, which measures how well the
+  amortization model approximates the true solution.
+  This crucial concept should be analyzed in most amortized
+  optimization settings to understand the accuracy of
+  the amortization model.
+\item \textbf{Implicit differentiation and shrinkage.}
+  \citet{chen2019modular,rajeswaran2019meta} show that penalizing
+  the amortization objective can significantly improve the
+  computational and memory requirements to train a semi-amortized
+  model for meta-learning. Many of the ideas in these settings
+  can be applied in other amortization settings,
+  as also observed by \citet{huszar2019imaml}.
+\item \textbf{Distribution shift of $p(x)$ and out-of-distribution generalization.}
+  This tutorial has assumed that $p(x)$ is fixed and remains
+  the same through the entire training process.
+  However, in some settings $p(x)$ may shift over time, which
+  could come from 1) the data generating process naturally
+  changing, or 2) a \emph{higher-level} learning process
+  also influencing $p(x)$.
+  Furthermore, after training on some context distribution $p(x)$,
+  a deploy model is likely not going to be evaluated on the
+  same distribution and should ideally be resilient
+  to out-of-distribution samples.
+  The out-of-distribution performance can often be measured
+  and quantified and reported alongside the model.
+  Even if the amortization model fails at optimizing \cref{eq:opt},
+  it's detectable because the optimality conditions of
+  \cref{eq:opt} or other solution quality metrics can be checked.
+  If the solution quality isn't high enough, then a slower
+  optimizer could potentially be used as a fallback.
+\item \textbf{Amortized and semi-amortized control and reinforcement learning.}
+  Applications of semi-amortization in control and reinforcement learning
+  covered in \cref{sec:apps:ctrl} are budding and
+  learning sample-efficient optimal controllers is
+  an active research area, especially in model-based settings
+  where the dynamics model is known or approximated.
+  \citet{amos2019dcem} shows how amortization can learn latent
+  control spaces that are aware of the structure of the
+  solutions to control problems.
+  \citet{marino2020iterative} study semi-amortized methods
+  based on gradient descent and show that they better-amortize
+  the solutions than the standard fully-amortized models.
+\end{enumerate}
+
+\section{Related work}
+\subsection{Other tutorials, reviews, and discussions
+  on amortized optimization}
+My goal in writing this tutorial was to provide a perspective
+of existing amortized optimization methods for learning
+to optimize with a categorization of the
+modeling (fully-amortized and semi-amortized)
+and learning (gradient-based, objective-based, or RL-based)
+aspects that I have found useful and have not seen
+emphasized as much in the literature.
+The other tutorials and reviews on
+amortized optimization, learning to optimize, and
+meta-learning over continuous domains
+that I am aware of are excellent resources:
+
+\begin{itemize}
+\item \citet{chen2021learning} captures many other emerging areas
+  of learning to optimize and discuss many other modeling paradigms
+  and optimization methods for learning to optimize, such as
+  plug-and-play methods \citep{venkatakrishnan2013plug,meinhardt2017learning,rick2017one,zhang2017learning}.
+  They emphasize the key aspects and questions to tackle as a community,
+  including model capacity, trainability, generalization, and
+  interpretability.
+  They propose \emph{Open-L2O} as a new benchmark for
+  learning to optimize and review many other applications,
+  including sparse and low-rank regression, graphical models,
+  differential equations, quadratic optimization, inverse problems,
+  constrained optimization, image restoration and reconstruction,
+  medical and biological imaging, wireless communications,
+  seismic imaging.
+\item \citet{shu2017amortized} is a blog post that discusses
+  fully-amortized models with gradient-based learning
+  and includes applications in variational inference,
+  meta-learning, image style transfer,
+  and survival-based classification.
+\item \citet{weng2018metalearning} is a blog post
+  with an introduction and review of meta-learning methods.
+  After defining the problem setup, the review discusses
+  metric-based, model-based, and optimization-based approaches,
+  and discusses approximations to the second-order derivatives
+  that come up with MAML.
+\item \citet{hospedales2020meta} is a review focused on meta-learning,
+  where they categorize meta-learning components into a
+  meta-representation, meta-optimizer, and meta-objective.
+  The most relevant connections to amortization here are that
+  the meta-representation can instantiate an
+  amortized optimization problem that is solved with the
+  meta-optimizer.
+\item \citet{kim2020deep} is a dissertation on deep
+  latent variable models for natural language
+  and contextualizes and studies the use of amortization and
+  semi-amortization in this setting.
+\item \citet{marino2021learned} is a dissertation on learned
+  feedback and feedforward information for perception and control
+  and contextualizes and studies the use of amortization and
+  semi-amortization in these settings.
+\item \citet{monga2021algorithm} is a review on
+  algorithm unrolling that starts with the unrolling
+  in LISTA \citep{gregor2010learning} for amortized
+  sparse coding, and then connects to other methods
+  of unrolling specialized algorithms.
+  While some unrolling methods have applications in
+  semi-amortized models, this review also considers
+  applications and use-cases beyond just
+  amortized optimization.
+\item \citet{banert2020data} consider theoretical foundations
+  for data-driven nonsmooth optimization and show applications
+  in deblurring and solving inverse problems for
+  computed tomography.
+\item \citet{liu2022teaching} study fully-amortized
+  models based on deep sets \citep{zaheer2017deep}
+  and set transformers \citep{lee2019set}.
+  They consider regression- and objective-based losses
+  for regression, PCA, core-set creation, and
+  supply management for cyber-physical systems.
+\end{itemize}
+
+\subsection{Amortized optimization over discrete domains}
+A significant generalization of \cref{eq:opt} is to optimization
+problems that have discrete domains,
+which includes combinatorial optimization
+and mixed discrete-continuous optimization.
+I have chosen to not include these works in this tutorial
+as many methods for discrete optimization are significantly
+different from the methods considered here, as learning with
+derivative information often becomes impossible.
+Key works in discrete and combinatorial spaces include
+\citet{khalil2016learning,dai2017learning,jeong2019learning,bertsimas2019online,shao2021learning,bertsimas2021voice,cappart2021combinatorial}
+and the surveys
+\citep{lodi2017learning,bengio2021machine,kotary2021end}
+capture a much broader view of this space.
+\citet{banerjee2015efficiently} consider repeated ILP solves
+and show applications in aircraft carrier deck scheduling and vehicle routing.
+For architecture search, \citet{luo2018neural} learn a continuous
+latent space behind the discrete architecture space.
+Many reinforcement learning and control methods over discrete
+spaces can also be seen as amortizing or semi-amortizing the
+discrete control problems, for example:
+\citet{cauligi2020learning,cauligi2021coco} use regression-based
+amortization to learn mixed-integer control policies.
+\citet{fickinger2021scalable} fine-tune the policy
+optimizer for every encountered state.
+\citet{tennenholtz2019natural,chandak2019learning,van2020q}
+learn latent action spaces for high-dimensional
+discrete action spaces with shared structure.
+
+\subsection{Learning-augmented and amortized algorithms beyond optimization}
+While many algorithms can be interpreted as solving an
+optimization problems or fixed-point computations and
+can therefore be improved with amortized optimization,
+it is also fruitful to use learning to improve
+algorithms that have nothing to do with optimization.
+Some key starting references in this space include
+data-driven algorithm design \citep{balcan2020data},
+algorithms with predictions
+\citep{dinitz2021faster,sakaue2022discrete,chen2022faster,khodak2022learning},
+learning to prune \citep{alabi2019learning},
+learning solutions to differential equations
+\citep{li2020fourier,poli2020hypersolvers,karniadakis2021physics,kovachki2021universal,chen2021solving,blechschmidt2021three,marwah2021parametric,berto2021neural}
+learning simulators for physics \citep{grzeszczuk1998neuroanimator,ladicky2015data,he2019learning,sanchez2020learning,wiewel2019latent,usman2021machine,vinuesa2021potential},
+and learning for symbolic math
+\citep{lample2019deep,charton2021linear,charton2021deep,drori2021neural,dascoli2022deep}
+\citet{salimans2022progressive} progressively amortizes a
+sampling process for diffusion models.
+\citet{schwarzschild2021can} learn recurrent neural networks
+to solve algorithmic problems for prefix sum, mazes, and chess.
+
+\subsection{Continuation and homotopy methods}
+Amortized optimization settings share a similar motivation to
+continuation and homotopy methods that have been studied for
+over four decades
+\citep{richter1983continuation,watson1989modern,allgower2012numerical}.
+These methods usually set the context space to be the
+interval $\gX=[0,1]$ and simultaneously solve (without learning)
+problems along this line.
+This similarity indicates that problem classes typically
+studied by continuation and homotopy methods could also benefit
+from the shared amortization models here.
+
+%%% Local Variables:
+%%% coding: utf-8
+%%% mode: latex
+%%% TeX-master: "../amor-nowplain.tex"
+%%% LaTeX-biblatex-use-Biber: True
+%%% End:
