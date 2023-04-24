@@ -1,7 +1,7 @@
 *.pdf
 *.gif
 *.png
-!**/fig/**/*.pdf
+!**/fig/**/*
 *.out
 *.toc
 *.log
