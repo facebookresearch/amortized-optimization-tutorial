@@ -48,6 +48,9 @@ is a quick way of checking the quality of the amortized model,
 If that is the case, then poorly-solved instances can be flagged
 and re-solved with a standard solver for the problem that
 may incur more computational time for that instance.
+\citet{sambharya2022l2ws} presents generalization bounds for learned
+warm-starts based on Rademacher complexity,
+and \citet{sambharya2023l2ws,sucker2024generalization} investigate PAC-Bayes generalization bounds.
 \citet{banert2021accelerated,premont2022simple} add provable
 convergence guarantees to semi-amortized models by guarding
 the update and ensuring the learned optimizer does not
@@ -64,6 +67,9 @@ in \citep{ravi2016optimization}.
 Other modeling and architecture tricks such as layer
 normalization \citep{ba2016layernorm} help improve the
 stability of amortized optimization models.
+Additionally, \citet{fahy2024greedya} investigates learning preconditioners
+and prove that their parameterization of the preconditioning space
+always results in a convergent optimizer.
 
 \section{Measuring performance}
 Quantifying the performance of amortization models can be even more
@@ -355,6 +361,9 @@ that I am aware of are excellent resources:
   They consider regression- and objective-based losses
   for regression, PCA, core-set creation, and
   supply management for cyber-physical systems.
+\item \citet{vanhentenryck2025optimizationlearning} presents an overview
+  of learned optimization methods arising in power systems,
+  for real-time risk assessment and security-constrained optimal power flow.
 \end{itemize}
 
 \subsection{Amortized optimization over discrete domains}

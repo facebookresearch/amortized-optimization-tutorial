@@ -45,8 +45,9 @@ on the use of amortization and semi-amortization in these settings.
 Historically, the use of an encoder network for amortized inference
 is often traced back to the Helmholtz machine \citep{dayan1995helmholtz},
 which uses a fully-amortized model but without a proper gradient estimator.
-\citet{sjolund2023tutorial} provides further background information and a
-tutorial on parametric variational inference.
+\citet{sjolund2023tutorial,zammit2024neural} provide further background
+information and tutorials on parametric, variational,
+and amortized inference.
 
 \subsection{The variational autoencoder (VAE) by \citet{kingma2013auto}}
 \label{sec:apps:vae}
@@ -514,6 +515,9 @@ The following selectively summarizes a few other relevant ideas:
   The key insight to supporting a variable number of parameters
   is to decompose the amortization model across parameter groups
   using an LSTM and hyper-network.
+\item MetaOptimize \citep{sharifnassab2024metaoptimize} predicts
+  the solutions to hyper-parameter optimization problems for machine learning,
+  showing results on image classification and language models.
 \end{enumerate}
 
 \section{Fixed-point computations and convex optimization}

@@ -9,7 +9,7 @@
     \node[right=.4in of model,yshift=2.5mm,text width=3.5in] (full) {Fully-amortized (\cref{sec:model:full}): no objective access};
     \node[below=-1mm of full,text width=3.5in] (semi) {Semi-amortized (\cref{sec:model:semi}): accesses objective};
     \node[below=.4in of model,align=right,text width=2.4in] (loss) {Amortization loss $\gL$ (\cref{sec:learning})};
-    \node[right=.4in of loss,yshift=2.5mm,text width=3.5in] (regression) {Regression (\cref{sec:learning:reg}): $\E_{p(x)} \|\hat y_\theta(x)-x\|_2^2$};
+    \node[right=.4in of loss,yshift=2.5mm,text width=3.5in] (regression) {Regression (\cref{sec:learning:reg}): $\E_{p(x)} \|\hat y_\theta(x)-y^\star(x)\|_2^2$};
     \node[below=-1mm of regression,text width=3.5in] (objective) {Objective (\cref{sec:learning:grad}): $\E_{p(x)} f(\hat y_\theta(x))$};
     \draw[->] (model.east) -- (full.west);
     \draw[->] (model.east) -- (semi.west);
@@ -1277,8 +1277,8 @@ where the constraints $\gC$ may also depend on the context $x$.
 associated with the optimality conditions of the constrained problem.
 A budding research area studies how to more generally include
 constraints into the formulation.
-\citet{baker2019learning,dong2020smart,zamzam2020learning,pan2020deepopf}
-learn to warm-start for optimal power flow.
+\citet{baker2019learning,dong2020smart,zamzam2020learning,pan2020deepopf,klamkin2025dualinteriorpointoptimization,vanhentenryck2025optimizationlearning}
+predict solutions to optimal power flow problems.
 \citet{misra2021learning} learn active sets for constrained optimization.
 \citet{krivachy2020fast} solves constrained feasibility semi-definite programs
 with a fully-amortized neural network model using an
