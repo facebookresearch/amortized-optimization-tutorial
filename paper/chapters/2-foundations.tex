@@ -95,7 +95,7 @@ and is used more generally in
 \citet[p.~28]{marino2021learned} give further background on the
 origins and uses of amortization.
 Concurrent to these developments, other communities have
-independently amortization methods without referring to them
+independently developed amortization methods without referring to them
 by the same terminology and analysis, such as in reinforcement learning,
 policy optimization, and sparse coding ---
 \cref{sec:apps} connects all of these under \cref{def:amor}.
@@ -155,7 +155,7 @@ The prefix ``fully'' can be omitted when the context is clear
 because most amortization is fully amortized.
 These are standard in amortized variational inference
 (\cref{sec:apps:avi}) and policy
-leaning (\cref{sec:apps:ctrl}), that typically use
+learning (\cref{sec:apps:ctrl}), that typically use
 feedforward neural networks to map from
 the context space $\gX$ to the solution of the
 optimization problem living in $\gY$.
@@ -717,7 +717,7 @@ iterate $y\in\gY$ of the domain is now transferred into the
 model's parameters that are shared across all problem instances.
 This also leads to a hypothesis that objective-based amortization
 works best when a gradient-based optimizer is able to successfully
-solve \cref{eq:opt} from scratch. However there may be settings
+solve \cref{eq:opt} from scratch. However, there may be settings
 where a gradient-based optimizer performs poorly but an amortized
 optimizer excels because it is able to use information from the
 other problem instances.

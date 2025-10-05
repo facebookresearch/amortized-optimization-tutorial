@@ -847,7 +847,7 @@ $s^{t+1}\defeq{\rm OSQP\_UPDATE}(s^t, \rho^t)$.
 
 RLQP proposes to use these OSQP iterates as a
 semi-amortized model with the iterates
-$\{s^t, \rho^t\}$. The propose to only parameterize and
+$\{s^t, \rho^t\}$. They propose to only parameterize and
 learn to predict the step size
 $\rho^{t+1}\defeq \pi_\theta(s^t)$, with a
 neural network amortization model $\pi_\theta$.
@@ -1057,7 +1057,7 @@ sphere $\gS^{d-1}$ with
 where $\theta_\#\alpha$ is the push-forward measure of $\mu$ through
 $T_\theta(x)=\theta^\top x$.
 \citet{nguyen2022amortized}
-proposal to amortize \cref{eq:max-sw} over mini-batches $\gD$ of size $m$
+propose to amortize \cref{eq:max-sw} over mini-batches $\gD$ of size $m$
 sampled from each measure.
 
 \textbf{Summary.}
@@ -1367,7 +1367,7 @@ This includes the policy improvement step for
 deterministic policies as pioneered by the
 deterministic policy gradient (DPG) by \citet{silver2014dpg},
 deep deterministic policy gradient (DDPG) by \citet{lillicrap2015continuous},
-and and twin delayed DDPG (TD3) by \citet{fujimoto2018td3}.
+and twin delayed DDPG (TD3) by \citet{fujimoto2018td3}.
 All of these methods interweave
 1) \emph{policy evaluation} to estimate the
 state-action value $Q^{\pi_\theta}$ of the current policy
@@ -1552,7 +1552,7 @@ problems with
 \gA_{\rm POPLIN}\defeq (-Q, \gU, \gX, p(x), \pi_\theta, \gL_{\rm reg}).
 \end{equation}
 The initial phase is fully-amortized behavioral cloning.
-The second fine-tuning phase can seen as semi-amortization
+The second fine-tuning phase can be seen as semi-amortization
 that learns only the initialization $\theta$ and
 finds $\omega$ with CEM, with a regression-based loss $\gL_{\rm reg}$
 that \emph{only} has knowledge of the initial model and does not include
